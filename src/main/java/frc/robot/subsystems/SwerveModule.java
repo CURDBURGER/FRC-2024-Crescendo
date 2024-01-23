@@ -76,10 +76,10 @@ public class SwerveModule {
   }
 
   private void configAngleEncoder() {
-
-    angleEncoder.configFactoryDefault();
-    CANCoderUtil.setCANCoderBusUsage(angleEncoder, CCUsage.kMinimal);
-    angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
+// TODO: we need this
+//    angleEncoder.configFactoryDefault();
+//    CANCoderUtil.setCANCoderBusUsage(angleEncoder, CCUsage.kMinimal);
+//    angleEncoder.configAllSettings(Robot.ctreConfigs.swerveCanCoderConfig);
   }
 
   private void configAngleMotor() {
@@ -144,7 +144,7 @@ public class SwerveModule {
   }
 
   public Rotation2d getCanCoder() {
-    return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
+    return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition().getValue());
   }
 
   public SwerveModuleState getState() {

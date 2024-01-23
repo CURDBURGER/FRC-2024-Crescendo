@@ -72,7 +72,8 @@ public class Swerve extends SubsystemBase {
   }
 
   public void resetOdometry(Pose2d pose) {
-    swerveOdometry.resetPosition(pose, getYaw());
+    // TODO: this
+    //    swerveOdometry.resetPosition(pose, getYaw());
   }
 
   public SwerveModuleState[] getStates() {
@@ -95,7 +96,8 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    swerveOdometry.update(getYaw(), getStates());
+    // TODO: This
+//    swerveOdometry.update(getYaw(), getStates());
     field.setRobotPose(getPose());
 
     for (SwerveModule mod : mSwerveMods) {
