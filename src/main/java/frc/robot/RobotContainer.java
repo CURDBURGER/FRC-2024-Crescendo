@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 
 /**
@@ -40,7 +40,7 @@ public class RobotContainer {
 
 
         drive = new Drive(
-                        new GyroIOPigeon2(),
+                        new GyroIONavX(),
                         new ModuleIOSparkMax(0),
                         new ModuleIOSparkMax(1),
                         new ModuleIOSparkMax(2),
