@@ -1,6 +1,7 @@
 package frc.robot;
 
-import com.revrobotics.CANSparkMax.IdleMode;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -71,15 +72,15 @@ public final class Constants {
     public static final double maxAngularVelocity = 11.5;
 
     /* Neutral Modes */
-    public static final IdleMode angleNeutralMode = IdleMode.kBrake;
-    public static final IdleMode driveNeutralMode = IdleMode.kBrake;
+    public static final CANSparkBase.IdleMode angleNeutralMode = CANSparkBase.IdleMode.kBrake;
+    public static final CANSparkBase.IdleMode driveNeutralMode = CANSparkBase.IdleMode.kBrake;
 
     /* Motor Inverts */
     public static final boolean driveInvert = false;
     public static final boolean angleInvert = false;
 
     /* Angle Encoder Invert */
-    public static final boolean canCoderInvert = false;
+    public static final SensorDirectionValue canCoderInvert = SensorDirectionValue.Clockwise_Positive;
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */

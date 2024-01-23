@@ -1,7 +1,7 @@
 package frc.lib.util;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix6.hardware.CANcoder;
+//import com.ctre.phoenix6.
 
 /** Sets status frames for the CTRE CANCoder. */
 public class CANCoderUtil {
@@ -23,7 +23,7 @@ public class CANCoderUtil {
    * @param usage The status frame feedback to enable. kAll is the default when a CANCoder
    *     isconstructed.
    */
-  public static void setCANCoderBusUsage(CANCoder cancoder, CCUsage usage) {
+  public static void setCANCoderBusUsage(CANcoder cancoder, CCUsage usage) {
     if (usage == CCUsage.kAll) {
       cancoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10);
       cancoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 10);
