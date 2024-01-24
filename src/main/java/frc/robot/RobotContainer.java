@@ -4,15 +4,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.autos.*;
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.ModuleIOSparkMax;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,32 +23,57 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  /* Controllers */
-  private final Joystick driver = new Joystick(0);
+  // Subsystems
+  private final Drive drive;
+//  private final Shooter shooter;
 
-  /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
 
-  /* Driver Buttons */
-  private final JoystickButton zeroGyro =
-      new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton robotCentric =
-      new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  // Controller
+  private final CommandXboxController controller = new CommandXboxController(0);
 
-  /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
+  // Dashboard inputs
+  // private final LoggedDashboardChooser<Command> autoChooser;
+//  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    s_Swerve.setDefaultCommand(
-        new TeleopSwerve(
-            s_Swerve,
-            () -> -driver.getRawAxis(translationAxis),
-            () -> -driver.getRawAxis(strafeAxis),
-            () -> -driver.getRawAxis(rotationAxis),
-            () -> false));
+
+
+        drive = new Drive(
+                        new GyroIONavX(),
+                        new ModuleIOSparkMax(0),
+                        new ModuleIOSparkMax(1),
+                        new ModuleIOSparkMax(2),
+                        new ModuleIOSparkMax(3)
+        );
+//        shooter = new Shooter(new ShooterIOSparkMax());
+
+        // flywheel = new Flywheel(new FlywheelIOSparkMax());
+        // drive = new Drive(
+        // new GyroIOPigeon2(),
+        // new ModuleIOTalonFX(0),
+        // new ModuleIOTalonFX(1),
+        // new ModuleIOTalonFX(2),
+        // new ModuleIOTalonFX(3));
+        // flywheel = new Flywheel(new FlywheelIOTalonFX());
+
+    // Set up auto routines
+    // NamedCommands.registerCommand(
+    //     "Run Flywheel",
+    //     Commands.startEnd(
+    //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
+    //         .withTimeout(5.0));
+    // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Set up feedforward characterization
+    // autoChooser.addOption(
+    //     "Drive FF Characterization",
+    //     new FeedForwardCharacterization(
+    //         drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    // autoChooser.addOption(
+    //     "Flywheel FF Characterization",
+    //     new FeedForwardCharacterization(
+    //         flywheel, flywheel::runVolts, flywheel::getCharacterizationVelocity));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -55,13 +82,42 @@ public class RobotContainer {
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * Joystick} or {@link XboxController}), and then passing it to a {@link
-   * JoystickButton}.
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /* Driver Buttons */
+    drive.setDefaultCommand(
+            DriveCommands.joystickDrive(
+                    drive,
+                    () -> -controller.getLeftY(),
+                    () -> -controller.getLeftX(),
+                    () -> -controller.getRightX()
+            )
+    );
 
-    zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller
+            .b()
+            .onTrue(
+                    Commands.runOnce(
+                                    () ->
+                                            drive.setPose(
+                                                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                                    drive)
+                            .ignoringDisable(true));
+
+//    shooter.setDefaultCommand(
+//            ShooterCommands.triggerShoot(
+//                    shooter,
+//                    () -> controller.getLeftTriggerAxis(),
+//                    () -> controller.getRightTriggerAxis()));
+
+
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         Commands.startEnd(
+    //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
   }
 
   /**
@@ -70,7 +126,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new ExampleAuto(s_Swerve);
+    // return autoChooser.get();
+    return null;
   }
 }
