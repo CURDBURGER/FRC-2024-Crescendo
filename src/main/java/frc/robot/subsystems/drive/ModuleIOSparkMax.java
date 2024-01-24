@@ -39,28 +39,28 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     public ModuleIOSparkMax(int index) {
         switch (index) {
-            case 0:
+            case 0: // FL
                 driveSparkMax = new CANSparkMax(11, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(1, MotorType.kBrushless);
                 turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
                 absoluteEncoderOffset = new Rotation2d(0); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(false);
                 break;
-            case 1:
+            case 1: // FR
                 driveSparkMax = new CANSparkMax(14, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(4, MotorType.kBrushless);
                 turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
                 absoluteEncoderOffset = new Rotation2d(0); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(true);
                 break;
-            case 2:
+            case 2: // BL
                 driveSparkMax = new CANSparkMax(12, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(2, MotorType.kBrushless);
                 turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
                 absoluteEncoderOffset = new Rotation2d(0); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(true);
                 break;
-            case 3:
+            case 3: // BR
                 driveSparkMax = new CANSparkMax(13, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(3, MotorType.kBrushless);
                 turnAbsoluteEncoder = turnSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
