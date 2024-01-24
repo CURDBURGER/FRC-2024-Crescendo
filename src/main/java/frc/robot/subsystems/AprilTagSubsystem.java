@@ -4,7 +4,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
-//import edu.wpi.first.math.geometry.Transform3d;
+
 import java.util.List;
 
 /**
@@ -12,7 +12,9 @@ import java.util.List;
  */
 public class AprilTagSubsystem extends SubsystemBase {
 
-    PhotonCamera camera
+    PhotonCamera camera;
+    List<PhotonTrackedTarget> targets = List.of();
+
     public AprilTagSubsystem() {
         camera = new PhotonCamera("photonvision");
 
@@ -24,21 +26,8 @@ public class AprilTagSubsystem extends SubsystemBase {
 
         var result = camera.getLatestResult();
 
-        boolean hasTargets = result.hasTargets();
-
 // Get a list of currently tracked targets.
-        List<PhotonTrackedTarget> targets = result.getTargets();
-
-        for(PhotonTrackedTarget target : targets){
-            int targetID = target.getFiducialId();
-            double poseAmbiguity = target.getPoseAmbiguity();
-
-            // Transform Doesnt actually exist?
-//            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-//            Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
-        }
-
-
+        targets = result.getTargets();
 
 
     }
@@ -51,6 +40,7 @@ public class AprilTagSubsystem extends SubsystemBase {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-
+    public List<PhotonTrackedTarget> gettargets() {
+        return targets;
+    }
 }
-
