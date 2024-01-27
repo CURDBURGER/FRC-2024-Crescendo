@@ -118,6 +118,15 @@ public class Drive extends SubsystemBase {
         }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
+
+        FLTab.add("Real Angle", modules[0].getState().angle);
+        FLTab.add("Real Velocity", modules[0].getState().speedMetersPerSecond);
+        FRTab.add("Real Angle", modules[1].getState().angle);
+        FRTab.add("Real Velocity", modules[1].getState().speedMetersPerSecond);
+        BLTab.add("Real Angle", modules[2].getState().angle);
+        BLTab.add("Real Velocity", modules[2].getState().speedMetersPerSecond);
+        BRTab.add("Real Angle", modules[3].getState().angle);
+        BRTab.add("Real Velocity", modules[3].getState().speedMetersPerSecond);
     }
 
     /**
@@ -143,6 +152,14 @@ public class Drive extends SubsystemBase {
         // Log setpoint states
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+        FLTab.add("Target Angle", setpointStates[0].angle);
+        FLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+        FRTab.add("Target Angle", setpointStates[0].angle);
+        FRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+        BLTab.add("Target Angle", setpointStates[0].angle);
+        BLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+        BRTab.add("Target Angle", setpointStates[0].angle);
+        BRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
     }
 
     /** Stops the drive. */
@@ -186,14 +203,6 @@ public class Drive extends SubsystemBase {
         for (int i = 0; i < 4; i++) {
             states[i] = modules[i].getState();
         }
-        FLTab.add("Real Angle", states[0].angle);
-        FLTab.add("Real Velocity", states[0].speedMetersPerSecond);
-        FRTab.add("Real Angle", states[0].angle);
-        FRTab.add("Real Velocity", states[0].speedMetersPerSecond);
-        BLTab.add("Real Angle", states[0].angle);
-        BLTab.add("Real Velocity", states[0].speedMetersPerSecond);
-        BRTab.add("Real Angle", states[0].angle);
-        BRTab.add("Real Velocity", states[0].speedMetersPerSecond);
         return states;
     }
 
