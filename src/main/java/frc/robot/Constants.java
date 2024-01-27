@@ -20,5 +20,7 @@ public static final class NotePickup {
     public final static int inputMotorChannel = 9; //is a motor not a solenoid
     public final static double inputMotorSpeed = 0.8; //make negative to reverse rotor
     public static int pivotMotor = 1;
+    public static int pivotEncoder1 = 0;
+    public static int pivotEncoder2 = 1;
 }
 }
