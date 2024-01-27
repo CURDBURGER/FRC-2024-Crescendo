@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class ManuelShooterCommand extends Command {
+public class ManualShooterCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
     private final double speed;
     private final CommandJoystick joystick = new CommandJoystick(0);
 
 
-    public ManuelShooterCommand(ShooterSubsystem shooterSubsystem) {
+    public ManualShooterCommand(ShooterSubsystem shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         speed = (joystick.getThrottle() + 1) / 2;
         addRequirements(shooterSubsystem);

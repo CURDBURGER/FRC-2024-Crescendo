@@ -3,11 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 
-public class PickUpMotorCommand extends Command {
+public class IntakeCommand extends Command {
     private final IntakeSubsystem intakeSubSystem;
     private final double speed;
 
-    public PickUpMotorCommand(IntakeSubsystem intakeSubSystem, double speed) {
+    public IntakeCommand(IntakeSubsystem intakeSubSystem, double speed) {
         this.intakeSubSystem = intakeSubSystem;
         this.speed = speed;
         addRequirements(intakeSubSystem);

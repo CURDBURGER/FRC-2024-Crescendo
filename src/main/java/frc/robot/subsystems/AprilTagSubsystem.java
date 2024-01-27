@@ -17,7 +17,6 @@ public class AprilTagSubsystem extends SubsystemBase {
 
     public AprilTagSubsystem() {
         camera = new PhotonCamera("photonvision");
-
     }
 
     @Override
@@ -40,7 +39,7 @@ public class AprilTagSubsystem extends SubsystemBase {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-    public List<PhotonTrackedTarget> gettargets() {
+    public List<PhotonTrackedTarget> getTargets() {
         return targets;
     }
 }

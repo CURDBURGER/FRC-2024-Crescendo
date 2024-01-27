@@ -13,17 +13,19 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.ClimberCommand;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ManuelShooterCommand;
+import frc.robot.commands.*;
+import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.pickup.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,6 +38,8 @@ public class RobotContainer {
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
@@ -98,13 +102,15 @@ public class RobotContainer {
      * JoystickButton}.
      */
     private void configureButtonBindings() {
-
         // Shooter
-        joystick.button(6).onTrue(new ManuelShooterCommand(shooterSubsystem));
+        joystick.button(6).onTrue(new ManualShooterCommand(shooterSubsystem));
 
         // climber
         controller.start().whileTrue(new ClimberCommand(climberSubsystem, 1.0));
         controller.back().whileTrue(new ClimberCommand(climberSubsystem, -1.0));
+
+        //auto shoot
+        //controller.a().whileTrue();
 
         // Drive
         drive.setDefaultCommand(
@@ -153,5 +159,25 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         // return autoChooser.get();
         return null;
+    }
+
+    private Command getAutoShoot(){
+     return new SequentialCommandGroup(
+             //new AutomaticAlignCommand(),
+             getManualShoot()
+     );
+    }
+
+    private Command getManualShoot(){
+        return new SequentialCommandGroup(
+                // spin up
+                new AutomaticShooterCommand(shooterSubsystem, 1000),
+                new ParallelCommandGroup(
+                        new ManualShooterCommand(shooterSubsystem),
+                        new IntakeCommand(intakeSubsystem, -1),
+                        new TimerCommand(1000)
+                )
+
+        );
     }
 }
