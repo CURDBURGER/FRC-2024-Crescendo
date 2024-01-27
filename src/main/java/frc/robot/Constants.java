@@ -16,5 +16,9 @@ public final class Constants {
 
 
 // TODO
-
+public static final class NotePickup {
+    public final static int inputMotorChannel = 9; //is a motor not a solenoid
+    public final static double inputMotorSpeed = 0.8; //make negative to reverse rotor
+    public static int pivotMotor = 1;
+}
 }
