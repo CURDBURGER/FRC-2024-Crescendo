@@ -14,8 +14,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ManuelShooterCommand;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
@@ -30,11 +34,12 @@ import frc.robot.subsystems.drive.ModuleIOSparkMax;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final ShooterSubsystem shooter;
-
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
     // Controller
-    private final CommandJoystick controller = new CommandJoystick(0);
+    private final CommandJoystick joystick = new CommandJoystick(0);
+    private final CommandXboxController controller = new CommandXboxController(1);
 
     // Dashboard inputs
     private final ShuffleboardTab tab = Shuffleboard.getTab("General");
@@ -46,8 +51,6 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        shooter = new ShooterSubsystem();
-
         drive = new Drive(
                 new GyroIONavX(),
                 new ModuleIOSparkMax(0),
@@ -95,30 +98,38 @@ public class RobotContainer {
      * JoystickButton}.
      */
     private void configureButtonBindings() {
-        shooter.setShooterSpeed(() -> (-controller.getThrottle() + 1) / 2);
+
+        // Shooter
+        joystick.button(6).onTrue(new ManuelShooterCommand(shooterSubsystem));
+
+        // climber
+        controller.start().whileTrue(new ClimberCommand(climberSubsystem, 1.0));
+        controller.back().whileTrue(new ClimberCommand(climberSubsystem, -1.0));
+
+        // Drive
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
                         () -> {
-                            var input = -controller.getY();
+                            var input = -joystick.getY();
                             tab.add("forward/back input", input);
                             return input;
                         },
                         () -> {
-                            var input = -controller.getX();
+                            var input = -joystick.getX();
                             tab.add("side/side input", input);
                             return input;
                         },
                         () -> {
-                            var input = -controller.getTwist();
+                            var input = -joystick.getTwist();
                             tab.add("spin input", input);
                             return input;
                         }
                 )
         );
 
-        controller.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
-        controller.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
+        joystick.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
+        joystick.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
 
 //    shooter.setDefaultCommand(
 //            ShooterCommands.triggerShoot(

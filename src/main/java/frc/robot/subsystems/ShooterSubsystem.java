@@ -4,10 +4,8 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import java.util.function.DoubleSupplier;
-
 public class ShooterSubsystem extends SubsystemBase {
-    private DoubleSupplier speed;
+    private double speed;
     CANSparkMax frontLeftMotor;
     CANSparkMax backLeftMotor;
     CANSparkMax frontRightMotor;
@@ -20,13 +18,13 @@ public class ShooterSubsystem extends SubsystemBase {
         this.backRightMotor = new CANSparkMax(Constants.Shooter.backRightMotorChannel, CANSparkMax.MotorType.kBrushed);
     }
 
-    public void setShooterSpeed(DoubleSupplier speed) {
+    public void setShooterSpeed(double speed) {
         this.speed = speed;
     }
 
     @Override
     public void periodic() {
-        var speed = this.speed.getAsDouble();
+        var speed = this.speed;
         frontLeftMotor.set(-speed);
         backLeftMotor.set(-speed);
         frontRightMotor.set(speed);

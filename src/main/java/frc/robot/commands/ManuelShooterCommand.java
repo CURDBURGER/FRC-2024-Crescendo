@@ -1,17 +1,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.ShooterSubsystem;
 
-import java.util.function.DoubleSupplier;
-
-public class ShooterCommand extends Command {
+public class ManuelShooterCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
-    private final DoubleSupplier speed;
+    private final double speed;
+    private final CommandJoystick joystick = new CommandJoystick(0);
 
-    public ShooterCommand(ShooterSubsystem shooterSubsystem, DoubleSupplier speed) {
+
+    public ManuelShooterCommand(ShooterSubsystem shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
-        this.speed = speed;
+        speed = (joystick.getThrottle() + 1) / 2;
         addRequirements(shooterSubsystem);
     }
 
@@ -26,7 +27,7 @@ public class ShooterCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        shooterSubsystem.setShooterSpeed(()->0);
+        shooterSubsystem.setShooterSpeed(0);
     }
 
     @Override
