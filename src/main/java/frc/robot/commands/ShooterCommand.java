@@ -3,11 +3,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import java.util.function.DoubleSupplier;
+
 public class ShooterCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
-    private final double speed;
+    private final DoubleSupplier speed;
 
-    public ShooterCommand(ShooterSubsystem shooterSubsystem, double speed) {
+    public ShooterCommand(ShooterSubsystem shooterSubsystem, DoubleSupplier speed) {
         this.shooterSubsystem = shooterSubsystem;
         this.speed = speed;
         addRequirements(shooterSubsystem);
@@ -24,7 +26,7 @@ public class ShooterCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        shooterSubsystem.setShooterSpeed(0);
+        shooterSubsystem.setShooterSpeed(()->0);
     }
 
     @Override
