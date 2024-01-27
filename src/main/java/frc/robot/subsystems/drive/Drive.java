@@ -5,6 +5,7 @@ package frc.robot.subsystems.drive;
 // import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 // import com.pathplanner.lib.util.PathPlannerLogging;
 // import com.pathplanner.lib.util.ReplanningConfig;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,7 +16,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+
 // import frc.robot.util.LocalADStarAK;
 
 
@@ -30,6 +35,11 @@ public class Drive extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+
+    private final ShuffleboardTab FLTab = Shuffleboard.getTab("FL");
+    private final ShuffleboardTab FRTab = Shuffleboard.getTab("FR");
+    private final ShuffleboardTab BLTab = Shuffleboard.getTab("BL");
+    private final ShuffleboardTab BRTab = Shuffleboard.getTab("BR");
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
@@ -176,6 +186,14 @@ public class Drive extends SubsystemBase {
         for (int i = 0; i < 4; i++) {
             states[i] = modules[i].getState();
         }
+        FLTab.add("Real Angle", states[0].angle);
+        FLTab.add("Real Velocity", states[0].speedMetersPerSecond);
+        FRTab.add("Real Angle", states[0].angle);
+        FRTab.add("Real Velocity", states[0].speedMetersPerSecond);
+        BLTab.add("Real Angle", states[0].angle);
+        BLTab.add("Real Velocity", states[0].speedMetersPerSecond);
+        BRTab.add("Real Angle", states[0].angle);
+        BRTab.add("Real Velocity", states[0].speedMetersPerSecond);
         return states;
     }
 

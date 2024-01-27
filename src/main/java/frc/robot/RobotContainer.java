@@ -8,10 +8,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
@@ -29,9 +30,11 @@ public class RobotContainer {
 
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandJoystick controller = new CommandJoystick(0);
 
   // Dashboard inputs
+  private final ShuffleboardTab tab = Shuffleboard.getTab("General");
+
   // private final LoggedDashboardChooser<Command> autoChooser;
 //  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
@@ -90,33 +93,25 @@ public class RobotContainer {
             DriveCommands.joystickDrive(
                     drive,
                     () -> {
-                      var input = -controller.getLeftY();
-                      SmartDashboard.putNumber("forwards/back input", input);
+                      var input = -controller.getY();
+                      tab.add("forward/back input", input);
                       return input;
                       },
                     () -> {
-                      var input = -controller.getLeftX();
-                      SmartDashboard.putNumber("side/side input", input);
+                      var input = -controller.getX();
+                      tab.add("side/side input", input);
                       return input;
                     },
                     () -> {
-                      var input = -controller.getRightX();
-                      SmartDashboard.putNumber("spin input", input);
+                      var input = -controller.getTwist();
+                      tab.add("spin input", input);
                       return input;
                     }
             )
     );
 
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller
-            .b()
-            .onTrue(
-                    Commands.runOnce(
-                                    () ->
-                                            drive.setPose(
-                                                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                                    drive)
-                            .ignoringDisable(true));
+    controller.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
 
 //    shooter.setDefaultCommand(
 //            ShooterCommands.triggerShoot(
