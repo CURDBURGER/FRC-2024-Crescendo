@@ -11,10 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -165,15 +162,13 @@ public class RobotContainer {
         return new SequentialCommandGroup(
                 // spin up
                 new ParallelRaceGroup(
-
                         new AutomaticAlignCommand(),
-                        new AutomaticShooterCommand(shooterSubsystem, 1000),
-                        new IsSpunUpCommand(shooterSubsystem, 1000)
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed)
                 ),
                 new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, 1000),
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
                         new IntakeCommand(intakeSubsystem, -1),
-                        new TimerCommand(1000)
+                        new TimerCommand(Constants.Shooter.outtakeTime)
                 )
         );
     }

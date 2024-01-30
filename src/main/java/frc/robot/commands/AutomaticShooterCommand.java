@@ -5,11 +5,11 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 public class AutomaticShooterCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
-    private double rpm;
+    private double speed;
 
-    public AutomaticShooterCommand(ShooterSubsystem shooterSubsystem, double rpm) {
+    public AutomaticShooterCommand(ShooterSubsystem shooterSubsystem, double speed) {
         this.shooterSubsystem = shooterSubsystem;
-        this.rpm = rpm;
+        this.speed = speed;
     }
 
     @Override
@@ -17,7 +17,7 @@ public class AutomaticShooterCommand extends Command {
     }
 
     @Override
-    public void execute() {shooterSubsystem.setShooterSpeed(rpm);}
+    public void execute() {shooterSubsystem.setShooterSpeed(speed);}
 
     @Override
     public void end(boolean interrupted) {shooterSubsystem.setShooterSpeed(0.0);}
