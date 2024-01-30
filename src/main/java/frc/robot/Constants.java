@@ -7,6 +7,8 @@ public final class Constants {
         public static int backLeftMotorChannel = 14;
         public static int frontRightMotorChannel = 15;
         public static int backRightMotorChannel = 16;
+        public static int encoderChannel1 = 0;
+        public static int encoderChannel2 = 1;
     }
 
     public static class Climber{

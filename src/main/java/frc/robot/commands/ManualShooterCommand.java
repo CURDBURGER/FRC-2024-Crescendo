@@ -12,7 +12,7 @@ public class ManualShooterCommand extends Command {
 
     public ManualShooterCommand(ShooterSubsystem shooterSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
-        speed = (joystick.getThrottle() + 1) / 2;
+        speed = (-joystick.getThrottle() + 1) / 2;
         addRequirements(shooterSubsystem);
     }
 
