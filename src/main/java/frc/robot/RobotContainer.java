@@ -99,15 +99,15 @@ public class RobotContainer {
      * JoystickButton}.
      */
     private void configureButtonBindings() {
-        // Shooter
-        joystick.button(6).onTrue(new ManualShooterCommand(shooterSubsystem));
-
-        // climber
+        // Climber
         controller.start().whileTrue(new ClimberCommand(climberSubsystem, 1.0));
         controller.back().whileTrue(new ClimberCommand(climberSubsystem, -1.0));
 
-        //auto shoot
-        //controller.a().whileTrue();
+        // Auto shoot
+        controller.a().whileTrue(getAutoShoot());
+
+        // Manual shoot
+        controller.x().whileTrue(getManualShoot());
 
         // Drive
         drive.setDefaultCommand(
@@ -133,6 +133,9 @@ public class RobotContainer {
 
         joystick.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
         joystick.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
+
+        // hooting
+
 
 //    shooter.setDefaultCommand(
 //            ShooterCommands.triggerShoot(
@@ -162,7 +165,7 @@ public class RobotContainer {
         return new SequentialCommandGroup(
                 // spin up
                 new ParallelRaceGroup(
-                        new AutomaticAlignCommand(),
+                        new AutomaticAlignCommand(aprilTagSubsystem),
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed)
                 ),
                 new ParallelRaceGroup(
@@ -176,12 +179,14 @@ public class RobotContainer {
     private Command getManualShoot() {
         return new SequentialCommandGroup(
                 // spin up
-//                new AutomaticShooterCommand(shooterSubsystem, 1000),
-                new ManualShooterCommand(shooterSubsystem),
                 new ParallelRaceGroup(
-                        new ManualShooterCommand(shooterSubsystem),
+                        new ManualShooterCommand(shooterSubsystem, joystick),
+                        new TimerCommand(Constants.Shooter.revTime)
+                ),
+                new ParallelRaceGroup(
+                        new ManualShooterCommand(shooterSubsystem, joystick),
                         new IntakeCommand(intakeSubsystem, -1),
-                        new TimerCommand(1000)
+                        new TimerCommand(Constants.Shooter.outtakeTime)
                 )
         );
     }

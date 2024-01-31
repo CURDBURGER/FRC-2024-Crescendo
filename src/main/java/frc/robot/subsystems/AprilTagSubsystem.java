@@ -3,9 +3,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-import java.util.List;
+import org.photonvision.targeting.MultiTargetPNPResult;
 
 /**
  *
@@ -13,7 +11,7 @@ import java.util.List;
 public class AprilTagSubsystem extends SubsystemBase {
 
     PhotonCamera camera;
-    List<PhotonTrackedTarget> targets = List.of();
+    MultiTargetPNPResult targets = null;
 
     public AprilTagSubsystem() {
         camera = new PhotonCamera("photonvision");
@@ -26,7 +24,7 @@ public class AprilTagSubsystem extends SubsystemBase {
         var result = camera.getLatestResult();
 
 // Get a list of currently tracked targets.
-        targets = result.getTargets();
+        targets = result.getMultiTagResult();
 
 
     }
@@ -39,7 +37,7 @@ public class AprilTagSubsystem extends SubsystemBase {
 
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-    public List<PhotonTrackedTarget> getTargets() {
+    public MultiTargetPNPResult getTargets() {
         return targets;
     }
 }
