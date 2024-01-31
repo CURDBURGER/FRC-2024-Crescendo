@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 
-public class ThreePieceCommand {
+public class ThreePieceTBCommand {
 
     public static Command create(
 
