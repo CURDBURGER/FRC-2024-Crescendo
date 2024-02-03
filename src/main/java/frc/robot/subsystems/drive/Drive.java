@@ -16,8 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -25,33 +23,33 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Drive extends SubsystemBase {
-    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(1.5);
+    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
     private static final double DRIVE_BASE_RADIUS =
             Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
-    private final GyroIO gyroIO;
-    private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
+    //private final GyroIO gyroIO;
+    //private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-    private final ShuffleboardTab FLTab = Shuffleboard.getTab("FL");
-    private final ShuffleboardTab FRTab = Shuffleboard.getTab("FR");
-    private final ShuffleboardTab BLTab = Shuffleboard.getTab("BL");
-    private final ShuffleboardTab BRTab = Shuffleboard.getTab("BR");
+//    private final ShuffleboardTab FLTab = Shuffleboard.getTab("FL");
+//    private final ShuffleboardTab FRTab = Shuffleboard.getTab("FR");
+//    private final ShuffleboardTab BLTab = Shuffleboard.getTab("BL");
+//    private final ShuffleboardTab BRTab = Shuffleboard.getTab("BR");
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
     private Rotation2d lastGyroRotation = new Rotation2d();
 
     public Drive(
-            GyroIO gyroIO,
+            //GyroIO gyroIO,
             ModuleIO flModuleIO,
             ModuleIO frModuleIO,
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
-        this.gyroIO = gyroIO;
+        //this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0);
         modules[1] = new Module(frModuleIO, 1);
         modules[2] = new Module(blModuleIO, 2);
@@ -82,7 +80,7 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
-        gyroIO.updateInputs(gyroInputs);
+        //gyroIO.updateInputs(gyroInputs);
         for (var module : modules) {
             module.periodic();
         }
@@ -108,25 +106,26 @@ public class Drive extends SubsystemBase {
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
-        if (gyroInputs.connected) {
-            // If the gyro is connected, replace the theta component of the twist
-            // with the change in angle since the last loop cycle.
-            twist =
-                    new Twist2d(
-                            twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
-            lastGyroRotation = gyroInputs.yawPosition;
-        }
+        //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
+        // if (gyroInputs.connected) {
+        //     // If the gyro is connected, replace the theta component of the twist
+        //     // with the change in angle since the last loop cycle.
+        //     twist =
+        //             new Twist2d(
+        //                     twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
+        //     lastGyroRotation = gyroInputs.yawPosition;
+        // }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
-
-        FLTab.add("Real Angle", modules[0].getState().angle);
-        FLTab.add("Real Velocity", modules[0].getState().speedMetersPerSecond);
-        FRTab.add("Real Angle", modules[1].getState().angle);
-        FRTab.add("Real Velocity", modules[1].getState().speedMetersPerSecond);
-        BLTab.add("Real Angle", modules[2].getState().angle);
-        BLTab.add("Real Velocity", modules[2].getState().speedMetersPerSecond);
-        BRTab.add("Real Angle", modules[3].getState().angle);
-        BRTab.add("Real Velocity", modules[3].getState().speedMetersPerSecond);
+//
+//        FLTab.add("Real Angle", modules[0].getState().angle);
+//        FLTab.add("Real Velocity", modules[0].getState().speedMetersPerSecond);
+//        FRTab.add("Real Angle", modules[1].getState().angle);
+//        FRTab.add("Real Velocity", modules[1].getState().speedMetersPerSecond);
+//        BLTab.add("Real Angle", modules[2].getState().angle);
+//        BLTab.add("Real Velocity", modules[2].getState().speedMetersPerSecond);
+//        BRTab.add("Real Angle", modules[3].getState().angle);
+//        BRTab.add("Real Velocity", modules[3].getState().speedMetersPerSecond);
     }
 
     /**
@@ -152,14 +151,14 @@ public class Drive extends SubsystemBase {
         // Log setpoint states
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-        FLTab.add("Target Angle", setpointStates[0].angle);
-        FLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        FRTab.add("Target Angle", setpointStates[0].angle);
-        FRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        BLTab.add("Target Angle", setpointStates[0].angle);
-        BLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        BRTab.add("Target Angle", setpointStates[0].angle);
-        BRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+//        FLTab.add("Target Angle", setpointStates[0].angle);
+//        FLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+//        FRTab.add("Target Angle", setpointStates[0].angle);
+//        FRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+//        BLTab.add("Target Angle", setpointStates[0].angle);
+//        BLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+//        BRTab.add("Target Angle", setpointStates[0].angle);
+//        BRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
     }
 
     /** Stops the drive. */

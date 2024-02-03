@@ -53,6 +53,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {}
+  
+    /**
+     * This function is called each time the robot leaves the disabled state
+     * Aka - This method runs when the robot is enabled.
+     */
+    @Override
+    public void disabledExit(){
+        m_robotContainer.robotEnabled();
+    }
+
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -93,4 +103,18 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
-}
+
+    /**
+     * This function is called once when the robot is first started up.
+     */
+    @Override
+    public void simulationInit() {
+    }
+
+    /**
+     * This function is called periodically whilst in simulation.
+     */
+    @Override
+    public void simulationPeriodic() {
+    }
+  }
