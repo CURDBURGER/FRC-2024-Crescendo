@@ -9,7 +9,6 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -174,6 +173,15 @@ public class Drive extends SubsystemBase {
         Rotation2d[] headings = new Rotation2d[4];
         for (int i = 0; i < 4; i++) {
             headings[i] = getModuleTranslations()[i].getAngle();
+        }
+        kinematics.resetHeadings(headings);
+        stop();
+    }
+
+    public void straightenWheels() {
+        Rotation2d[] headings = new Rotation2d[4];
+        for (int i = 0; i < 4; i++) {
+            headings[i] = new Rotation2d(0);
         }
         kinematics.resetHeadings(headings);
         stop();

@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,11 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-//import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 
@@ -92,9 +88,11 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
     }
-    public void robotEnabled(){
+
+    public void robotEnabled() {
         getManualShoot();
     }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be created by
      * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -128,6 +126,7 @@ public class RobotContainer {
                             return input;
                         },
                         () -> {
+                           // var input = joystick.getTwist();
                             var input = 0;
                             //tab.add("spin input", input);
                             return input;
