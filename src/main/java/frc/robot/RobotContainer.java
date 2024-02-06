@@ -135,6 +135,7 @@ public class RobotContainer {
         );
 
         joystick.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
+        joystick.button(11).onTrue(Commands.runOnce(drive::straightenWheels, drive));
         //joystick.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
 
         // hooting
