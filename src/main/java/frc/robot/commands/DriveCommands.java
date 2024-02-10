@@ -6,15 +6,27 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
     private static final double DEADBAND = 0.1;
 
-    private DriveCommands() {}
+
+    private static ShuffleboardTab tab = Shuffleboard.getTab("general");
+    //    private static GenericEntry xLog, yLog, zLog;
+    private static GenericEntry xLog = tab.add("x", 0.0).getEntry();
+    private static GenericEntry yLog = tab.add("y", 0.0).getEntry();
+    private static GenericEntry zLog = tab.add("z", 0.0).getEntry();
+
+    private DriveCommands() {
+    }
 
     /**
      * Field relative drive command using two joysticks (controlling linear and angular velocities).
@@ -27,11 +39,8 @@ public class DriveCommands {
         return Commands.run(
                 () -> {
                     // Apply deadband
-                    //   double linearMagnitude =
-                    //       MathUtil.applyDeadband(
-                    //           Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
                     double linearMagnitude = MathUtil.applyDeadband(
-                                    Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
+                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
                     Rotation2d linearDirection =
                             new Rotation2d(-xSupplier.getAsDouble(), ySupplier.getAsDouble());
                     double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
@@ -39,6 +48,11 @@ public class DriveCommands {
                     // Square values
                     linearMagnitude = linearMagnitude * linearMagnitude;
                     omega = Math.copySign(omega * omega, omega);
+
+                    // Log inputs after deadband and square
+                    xLog.setDouble(linearDirection.getCos() * linearMagnitude);
+                    yLog.setDouble(linearDirection.getSin() * linearMagnitude);
+                    zLog.setDouble(omega);
 
                     // Calculate new linear velocity
                     Translation2d linearVelocity =
@@ -52,7 +66,9 @@ public class DriveCommands {
                                     linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                                     linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                                     omega * drive.getMaxAngularSpeedRadPerSec(),
-                                    drive.getRotation()));
+                                    drive.getRotation()
+                            )
+                    );
                 },
                 drive);
     }

@@ -34,12 +34,13 @@ public class Module {
     private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
     private double lastPositionMeters = 0.0; // Used for delta calculation
 
-//    private final ShuffleboardTab FLTab;
 
     public Module(ModuleIO io, int index, String title) {
         this.io = io;
         this.index = index;
         this.title = title;
+
+        // Set up shuffleboard
         var tab = Shuffleboard.getTab(title);
         realAngle = tab.add("Real Angle" + title, 0).getEntry();
         realVelocity = tab.add("Real Velocity" + title, 0).getEntry();
@@ -101,6 +102,7 @@ public class Module {
             }
         }
 
+        // Logging
         realAngle.setDouble(getState().angle.getDegrees());
         realVelocity.setDouble(getState().speedMetersPerSecond);
        
@@ -116,6 +118,7 @@ public class Module {
         angleSetpoint = optimizedState.angle;
         speedSetpoint = optimizedState.speedMetersPerSecond;
 
+        // Logging
         targetAngle.setDouble(angleSetpoint.getDegrees());
         targetVelocity.setDouble(speedSetpoint);
 
