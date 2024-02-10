@@ -9,6 +9,8 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
+import static frc.robot.Constants.WheelModule.*;
+
 /**
  * Module IO implementation for SparkMax drive motor controller, SparkMax turn motor controller (NEO
  * or NEO 550), and analog absolute encoder connected to the RIO
@@ -24,7 +26,7 @@ import edu.wpi.first.math.util.Units;
 public class ModuleIOSparkMax implements ModuleIO {
     // Gear ratios for SDS MK4i L2, adjust as necessary
     private static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-    private static final double TURN_GEAR_RATIO = 150.0 / 7.0;
+    private static final double TURN_GEAR_RATIO = 150.0 / 7.0;     // Check if rotation is correct
 
     private final CANSparkMax driveSparkMax;
     private final CANSparkMax turnSparkMax;
@@ -38,28 +40,28 @@ public class ModuleIOSparkMax implements ModuleIO {
 
     public ModuleIOSparkMax(int index) {
         switch (index) {
-            case 0: //
+            case FRONT_LEFT: // FL
                 driveSparkMax = new CANSparkMax(6, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(5, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(1, "rio");
                 absoluteEncoderOffset = new Rotation2d((-0.781982421875 * 0) * 2.0 * Math.PI); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(true);
                 break;
-            case 1: //
+            case FRONT_RIGHT: // FR
                 driveSparkMax = new CANSparkMax(8, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(7, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(2, "rio");
                 absoluteEncoderOffset = new Rotation2d((-0.382568359375 * 0) * 2.0 * Math.PI); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(true);
                 break;
-            case 2: //
+            case BACK_LEFT: // BL
                 driveSparkMax = new CANSparkMax(1, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(2, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(3, "rio");
                 absoluteEncoderOffset = new Rotation2d((-0.77197265625 * 0) * 2.0 * Math.PI); // MUST BE CALIBRATED
                 driveSparkMax.setInverted(true);
                 break;
-            case 3: //
+            case BACK_RIGHT: // BR
                 driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(4, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(4, "rio");

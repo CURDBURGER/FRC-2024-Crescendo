@@ -24,6 +24,8 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 
+import static frc.robot.Constants.WheelModule.*;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -54,10 +56,10 @@ public class RobotContainer {
     public RobotContainer() {
         drive = new Drive(
                 new GyroIONavX(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3)
+                new ModuleIOSparkMax(FRONT_LEFT),
+                new ModuleIOSparkMax(FRONT_RIGHT),
+                new ModuleIOSparkMax(BACK_LEFT),
+                new ModuleIOSparkMax(BACK_RIGHT)
         );
         // Configure the button bindings
         configureButtonBindings();

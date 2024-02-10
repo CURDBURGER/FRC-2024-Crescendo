@@ -1,13 +1,5 @@
 package frc.robot.subsystems.drive;
 
-import java.util.logging.Logger;
-
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.pathfinding.Pathfinding;
-// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-// import com.pathplanner.lib.util.PathPlannerLogging;
-// import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,9 +12,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.Constants.WheelModule.*;
 
 
 // import frc.robot.util.LocalADStarAK;
@@ -54,10 +46,10 @@ public class Drive extends SubsystemBase {
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
-        modules[0] = new Module(flModuleIO, 0, "FL");
-        modules[1] = new Module(frModuleIO, 1,"FR");
-        modules[2] = new Module(blModuleIO, 2,"BL");
-        modules[3] = new Module(brModuleIO, 3,"BR");
+        modules[FRONT_LEFT] = new Module(flModuleIO, 0, "FL");
+        modules[FRONT_RIGHT] = new Module(frModuleIO, 1,"FR");
+        modules[BACK_LEFT] = new Module(blModuleIO, 2,"BL");
+        modules[BACK_RIGHT] = new Module(brModuleIO, 3,"BR");
 
         publisher = NetworkTableInstance
             .getDefault()
@@ -220,10 +212,10 @@ public class Drive extends SubsystemBase {
     /** Returns an array of module translations. */
     public static Translation2d[] getModuleTranslations() {
         return new Translation2d[] {
-                new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-                new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
+                new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // FL
+                new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0), // FR
+                new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // BL
+                new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0) // BR
         };
     }
 }
