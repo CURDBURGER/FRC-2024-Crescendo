@@ -26,4 +26,7 @@ public static final class NotePickup {
     public static int pivotEncoder1 = 0;
     public static int pivotEncoder2 = 1;
 }
+
+
+public static final double DEAD_ZONE = 0.02;
 }

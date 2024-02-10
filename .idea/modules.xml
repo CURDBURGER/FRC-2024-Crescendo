@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Code.FRC-2024-Crescendo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Code.FRC-2024-Crescendo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.iml" filepath="$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.test.iml" filepath="$PROJECT_DIR$/.idea/modules/FRC-2024-Crescendo.test.iml" />
     </modules>
   </component>
 </project>

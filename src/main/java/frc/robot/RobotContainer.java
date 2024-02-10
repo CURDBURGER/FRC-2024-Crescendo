@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -18,6 +20,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 
@@ -39,8 +42,16 @@ public class RobotContainer {
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
 
+    //Deadzone
+    double deadZone(double control) {
+        if (Math.abs(control) < Constants.DEAD_ZONE) {
+            return 0.0;
+        }
+        return control;
+    }
+
     // Dashboard inputs
-    //private final ShuffleboardTab tab = Shuffleboard.getTab("General");
+    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
 
     // private final LoggedDashboardChooser<Command> autoChooser;
 //  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
@@ -50,41 +61,12 @@ public class RobotContainer {
      */
     public RobotContainer() {
         drive = new Drive(
-                //new GyroIONavX(),
+                new GyroIONavX(),
                 new ModuleIOSparkMax(0),
                 new ModuleIOSparkMax(1),
                 new ModuleIOSparkMax(2),
                 new ModuleIOSparkMax(3)
         );
-//        shooter = new Shooter(new ShooterIOSparkMax());
-
-        // flywheel = new Flywheel(new FlywheelIOSparkMax());
-        // drive = new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFX(0),
-        // new ModuleIOTalonFX(1),
-        // new ModuleIOTalonFX(2),
-        // new ModuleIOTalonFX(3));
-        // flywheel = new Flywheel(new FlywheelIOTalonFX());
-
-        // Set up auto routines
-        // NamedCommands.registerCommand(
-        //     "Run Flywheel",
-        //     Commands.startEnd(
-        //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
-        //         .withTimeout(5.0));
-        // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Set up feedforward characterization
-        // autoChooser.addOption(
-        //     "Drive FF Characterization",
-        //     new FeedForwardCharacterization(
-        //         drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
-        // autoChooser.addOption(
-        //     "Flywheel FF Characterization",
-        //     new FeedForwardCharacterization(
-        //         flywheel, flywheel::runVolts, flywheel::getCharacterizationVelocity));
-
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -116,19 +98,15 @@ public class RobotContainer {
                 DriveCommands.joystickDrive(
                         drive,
                         () -> {
-                            var input = -joystick.getY();
-                            //tab.add("forward/back input", input);
+                            var input = joystick.getY();
                             return input;
                         },
                         () -> {
-                            var input = -joystick.getX();
-                            //tab.add("side/side input", input);
+                            var input = joystick.getX();
                             return input;
                         },
                         () -> {
-                           // var input = joystick.getTwist();
-                            var input = 0;
-                            //tab.add("spin input", input);
+                            var input = joystick.getTwist();
                             return input;
                         }
                 )
@@ -137,22 +115,6 @@ public class RobotContainer {
         joystick.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
         joystick.button(11).onTrue(Commands.runOnce(drive::straightenWheels, drive));
         //joystick.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
-
-        // hooting
-
-
-//    shooter.setDefaultCommand(
-//            ShooterCommands.triggerShoot(
-//                    shooter,
-//                    () -> controller.getLeftTriggerAxis(),
-//                    () -> controller.getRightTriggerAxis()));
-
-
-        // controller
-        //     .a()
-        //     .whileTrue(
-        //         Commands.startEnd(
-        //             () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
     }
 
     /**
