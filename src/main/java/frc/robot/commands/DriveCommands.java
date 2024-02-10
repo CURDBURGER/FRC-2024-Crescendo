@@ -19,11 +19,11 @@ public class DriveCommands {
     private static final double DEADBAND = 0.1;
 
 
-    private static ShuffleboardTab tab = Shuffleboard.getTab("general");
+    private static ShuffleboardTab tab = Shuffleboard.getTab("General");
     //    private static GenericEntry xLog, yLog, zLog;
-    private static GenericEntry xLog = tab.add("x", 0.0).getEntry();
-    private static GenericEntry yLog = tab.add("y", 0.0).getEntry();
-    private static GenericEntry zLog = tab.add("z", 0.0).getEntry();
+    private static GenericEntry xLog = tab.add("x forward", 0.0).getEntry();
+    private static GenericEntry yLog = tab.add("y left", 0.0).getEntry();
+    private static GenericEntry zLog = tab.add("z rotate ccw", 0.0).getEntry();
 
     private DriveCommands() {
     }
