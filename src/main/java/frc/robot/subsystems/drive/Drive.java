@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import java.util.logging.Logger;
+
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.pathfinding.Pathfinding;
 // import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -15,6 +17,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -33,7 +37,7 @@ public class Drive extends SubsystemBase {
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
     private final GyroIO gyroIO;
-     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
+    private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
   
@@ -41,7 +45,8 @@ public class Drive extends SubsystemBase {
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
     private Rotation2d lastGyroRotation = new Rotation2d();
-
+    private StructArrayPublisher<SwerveModuleState> publisher;
+    
     public Drive(
             GyroIO gyroIO,
             ModuleIO flModuleIO,
@@ -53,6 +58,11 @@ public class Drive extends SubsystemBase {
         modules[1] = new Module(frModuleIO, 1,"FR");
         modules[2] = new Module(blModuleIO, 2,"BL");
         modules[3] = new Module(brModuleIO, 3,"BR");
+
+        publisher = NetworkTableInstance
+            .getDefault()
+            .getStructArrayTopic("MyStates", SwerveModuleState.struct)
+            .publish();
     }
 
     public void periodic() {
@@ -116,6 +126,9 @@ public class Drive extends SubsystemBase {
         }
 
         optimizedSetpointStates = setpointStates;
+        
+        publisher.set(optimizedSetpointStates);
+       
 
 
 
