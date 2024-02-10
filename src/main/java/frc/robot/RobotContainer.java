@@ -19,7 +19,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 
 import static frc.robot.Constants.WheelModule.*;
@@ -54,10 +54,10 @@ public class RobotContainer {
     public RobotContainer() {
         drive = new Drive(
                 new GyroIONavX(),
-                new ModuleIOSparkMax(FRONT_LEFT),
-                new ModuleIOSparkMax(FRONT_RIGHT),
-                new ModuleIOSparkMax(BACK_LEFT),
-                new ModuleIOSparkMax(BACK_RIGHT)
+                new ModuleIOTalonFX(FRONT_LEFT),
+                new ModuleIOTalonFX(FRONT_RIGHT),
+                new ModuleIOTalonFX(BACK_LEFT),
+                new ModuleIOTalonFX(BACK_RIGHT)
         );
         // Configure the button bindings
         configureButtonBindings();
