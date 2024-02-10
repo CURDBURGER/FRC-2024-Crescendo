@@ -32,13 +32,12 @@ public class Drive extends SubsystemBase {
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-  
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
     private Rotation2d lastGyroRotation = new Rotation2d();
     private StructArrayPublisher<SwerveModuleState> publisher;
-    
+
     public Drive(
             GyroIO gyroIO,
             ModuleIO flModuleIO,
@@ -47,14 +46,14 @@ public class Drive extends SubsystemBase {
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
         modules[FRONT_LEFT] = new Module(flModuleIO, 0, "FL");
-        modules[FRONT_RIGHT] = new Module(frModuleIO, 1,"FR");
-        modules[BACK_LEFT] = new Module(blModuleIO, 2,"BL");
-        modules[BACK_RIGHT] = new Module(brModuleIO, 3,"BR");
+        modules[FRONT_RIGHT] = new Module(frModuleIO, 1, "FR");
+        modules[BACK_LEFT] = new Module(blModuleIO, 2, "BL");
+        modules[BACK_RIGHT] = new Module(brModuleIO, 3, "BR");
 
         publisher = NetworkTableInstance
-            .getDefault()
-            .getStructArrayTopic("MyStates", SwerveModuleState.struct)
-            .publish();
+                .getDefault()
+                .getStructArrayTopic("MyStates", SwerveModuleState.struct)
+                .publish();
     }
 
     public void periodic() {
@@ -85,18 +84,20 @@ public class Drive extends SubsystemBase {
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
         //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
-         if (gyroInputs.connected) {
-             // If the gyro is connected, replace the theta component of the twist
-             // with the change in angle since the last loop cycle.
-             twist =
-                     new Twist2d(
-                             twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
-             lastGyroRotation = gyroInputs.yawPosition;
-         }
+        if (gyroInputs.connected) {
+            // If the gyro is connected, replace the theta component of the twist
+            // with the change in angle since the last loop cycle.
+            twist = new Twist2d(
+                    twist.dx,
+                    twist.dy,
+                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+            );
+            lastGyroRotation = gyroInputs.yawPosition;
+        }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
 //
-       
+
     }
 
     /**
@@ -118,19 +119,19 @@ public class Drive extends SubsystemBase {
         }
 
         optimizedSetpointStates = setpointStates;
-        
-        publisher.set(optimizedSetpointStates);
-       
 
+        publisher.set(optimizedSetpointStates);
 
 
         // Log setpoint states
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-       
+
     }
 
-    /** Stops the drive. */
+    /**
+     * Stops the drive.
+     */
     public void stop() {
         runVelocity(new ChassisSpeeds());
     }
@@ -157,14 +158,18 @@ public class Drive extends SubsystemBase {
         stop();
     }
 
-    /** Runs forwards at the commanded voltage. */
+    /**
+     * Runs forwards at the commanded voltage.
+     */
     public void runCharacterizationVolts(double volts) {
         for (int i = 0; i < 4; i++) {
             modules[i].runCharacterization(volts);
         }
     }
 
-    /** Returns the average drive velocity in radians/sec. */
+    /**
+     * Returns the average drive velocity in radians/sec.
+     */
     public double getCharacterizationVelocity() {
         double driveVelocityAverage = 0.0;
         for (var module : modules) {
@@ -173,7 +178,9 @@ public class Drive extends SubsystemBase {
         return driveVelocityAverage / 4.0;
     }
 
-    /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+    /**
+     * Returns the module states (turn angles and drive velocities) for all of the modules.
+     */
 //    @AutoLogOutput(key = "SwerveStates/Measured")
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -183,35 +190,47 @@ public class Drive extends SubsystemBase {
         return states;
     }
 
-    /** Returns the current odometry pose. */
+    /**
+     * Returns the current odometry pose.
+     */
 //    @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
         return pose;
     }
 
-    /** Returns the current odometry rotation. */
+    /**
+     * Returns the current odometry rotation.
+     */
     public Rotation2d getRotation() {
         return gyroInputs.yawPosition;
     }
 
-    /** Resets the current odometry pose. */
+    /**
+     * Resets the current odometry pose.
+     */
     public void setPose(Pose2d pose) {
         this.pose = pose;
     }
 
-    /** Returns the maximum linear speed in meters per sec. */
+    /**
+     * Returns the maximum linear speed in meters per sec.
+     */
     public double getMaxLinearSpeedMetersPerSec() {
         return MAX_LINEAR_SPEED;
     }
 
-    /** Returns the maximum angular speed in radians per sec. */
+    /**
+     * Returns the maximum angular speed in radians per sec.
+     */
     public double getMaxAngularSpeedRadPerSec() {
         return MAX_ANGULAR_SPEED;
     }
 
-    /** Returns an array of module translations. */
+    /**
+     * Returns an array of module translations.
+     */
     public static Translation2d[] getModuleTranslations() {
-        return new Translation2d[] {
+        return new Translation2d[]{
                 new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // FL
                 new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0), // FR
                 new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // BL

@@ -10,5 +10,6 @@ public interface GyroIO {
         public Rotation2d yawPosition = new Rotation2d();
     }
 
-    default void updateInputs(GyroIOInputs inputs) {}
+    default void updateInputs(GyroIOInputs inputs) {
+    }
 }

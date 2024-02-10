@@ -11,6 +11,7 @@ public class PivotSubsystem extends SubsystemBase {
     public enum PivotPosition {
         in, out;
     }
+
     private final MotorController pivotMotor;
     private double speed;
     private final Encoder pivotEncoder;
@@ -30,7 +31,7 @@ public class PivotSubsystem extends SubsystemBase {
     public void periodic() {
 
         var position = pivotEncoder.get();
-        if (pivotPosition == PivotPosition.out && position < 245){
+        if (pivotPosition == PivotPosition.out && position < 245) {
             pivotMotor.set(0.25);
         } else if (pivotPosition == pivotPosition.in && position > 0) {
             pivotMotor.set(-0.25);

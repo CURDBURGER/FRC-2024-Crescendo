@@ -8,21 +8,21 @@ import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-        private final MotorController pickUpMotor;
-        private double speed;
+    private final MotorController pickUpMotor;
+    private double speed;
 
-        public IntakeSubsystem() {
-            this.pickUpMotor = new Victor(Constants.NotePickup.inputMotorChannel);
-        }
-
-        public void setPickUpMotorSpeed(double speed) {
-            this.speed = speed;
-        }
-
-        @Override
-        public void periodic() {
-            pickUpMotor.set(speed);
-        }
+    public IntakeSubsystem() {
+        this.pickUpMotor = new Victor(Constants.NotePickup.inputMotorChannel);
     }
+
+    public void setPickUpMotorSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    @Override
+    public void periodic() {
+        pickUpMotor.set(speed);
+    }
+}
 
 
