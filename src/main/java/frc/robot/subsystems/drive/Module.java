@@ -6,7 +6,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 
 public class Module {
@@ -15,6 +18,13 @@ public class Module {
     private final ModuleIO io;
     private final ModuleIO.ModuleIOInputs inputs = new ModuleIO.ModuleIOInputs();
     private final int index;
+    private final String title;
+    private GenericEntry realAngle;
+    private GenericEntry realVelocity;
+    private GenericEntry targetAngle;
+    private GenericEntry targetVelocity;
+
+
 
     private final SimpleMotorFeedforward driveFeedforward;
     private final PIDController driveFeedback;
@@ -24,9 +34,18 @@ public class Module {
     private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
     private double lastPositionMeters = 0.0; // Used for delta calculation
 
-    public Module(ModuleIO io, int index) {
+//    private final ShuffleboardTab FLTab;
+
+    public Module(ModuleIO io, int index, String title) {
         this.io = io;
         this.index = index;
+        this.title = title;
+        var tab = Shuffleboard.getTab(title);
+        realAngle = tab.add("Real Angle" + title, 0).getEntry();
+        realVelocity = tab.add("Real Velocity" + title, 0).getEntry();
+        targetAngle = tab.add("Target Angle" + title, 0).getEntry();
+        targetVelocity = tab.add("Target Velocity" + title, 0).getEntry();
+
 
         // Constants here may change for SIM
 
@@ -81,6 +100,10 @@ public class Module {
                                 + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
             }
         }
+
+        realAngle.setDouble(getState().angle.getDegrees());
+        realVelocity.setDouble(getState().speedMetersPerSecond);
+       
     }
 
     /** Runs the module with the specified setpoint state. Returns the optimized state. */
@@ -92,6 +115,9 @@ public class Module {
         // Update setpoints, controllers run in "periodic"
         angleSetpoint = optimizedState.angle;
         speedSetpoint = optimizedState.speedMetersPerSecond;
+
+        targetAngle.setDouble(angleSetpoint.getDegrees());
+        targetVelocity.setDouble(speedSetpoint);
 
         return optimizedState;
     }

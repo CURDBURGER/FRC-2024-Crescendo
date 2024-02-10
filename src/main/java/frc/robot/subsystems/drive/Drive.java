@@ -36,10 +36,7 @@ public class Drive extends SubsystemBase {
      private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-   private final ShuffleboardTab FLTab = Shuffleboard.getTab("FL");
-   private final ShuffleboardTab FRTab = Shuffleboard.getTab("FR");
-   private final ShuffleboardTab BLTab = Shuffleboard.getTab("BL");
-   private final ShuffleboardTab BRTab = Shuffleboard.getTab("BR");
+  
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
@@ -52,10 +49,10 @@ public class Drive extends SubsystemBase {
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
-        modules[0] = new Module(flModuleIO, 0);
-        modules[1] = new Module(frModuleIO, 1);
-        modules[2] = new Module(blModuleIO, 2);
-        modules[3] = new Module(brModuleIO, 3);
+        modules[0] = new Module(flModuleIO, 0, "FL");
+        modules[1] = new Module(frModuleIO, 1,"FR");
+        modules[2] = new Module(blModuleIO, 2,"BL");
+        modules[3] = new Module(brModuleIO, 3,"BR");
     }
 
     public void periodic() {
@@ -97,14 +94,7 @@ public class Drive extends SubsystemBase {
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
 //
-       FLTab.add("Real Angle", modules[0].getState().angle);
-       FLTab.add("Real Velocity", modules[0].getState().speedMetersPerSecond);
-       FRTab.add("Real Angle", modules[1].getState().angle);
-       FRTab.add("Real Velocity", modules[1].getState().speedMetersPerSecond);
-       BLTab.add("Real Angle", modules[2].getState().angle);
-       BLTab.add("Real Velocity", modules[2].getState().speedMetersPerSecond);
-       BRTab.add("Real Angle", modules[3].getState().angle);
-       BRTab.add("Real Velocity", modules[3].getState().speedMetersPerSecond);
+       
     }
 
     /**
@@ -127,17 +117,12 @@ public class Drive extends SubsystemBase {
 
         optimizedSetpointStates = setpointStates;
 
+
+
         // Log setpoint states
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-       FLTab.add("Target Angle", setpointStates[0].angle);
-       FLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-       FRTab.add("Target Angle", setpointStates[0].angle);
-       FRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-       BLTab.add("Target Angle", setpointStates[0].angle);
-       BLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-       BRTab.add("Target Angle", setpointStates[0].angle);
-       BRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+       
     }
 
     /** Stops the drive. */

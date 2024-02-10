@@ -50,14 +50,14 @@ public class ModuleIOSparkMax implements ModuleIO {
                 turnSparkMax = new CANSparkMax(7, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(2, "rio");
                 absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
-                driveSparkMax.setInverted(true);
+                driveSparkMax.setInverted(false);
                 break;
             case 2: //
                 driveSparkMax = new CANSparkMax(1, MotorType.kBrushless);
                 turnSparkMax = new CANSparkMax(2, MotorType.kBrushless);
                 turnAbsoluteEncoder = new CANcoder(3, "rio");
                 absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
-                driveSparkMax.setInverted(true);
+                driveSparkMax.setInverted(false);
                 break;
             case 3: //
                 driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
