@@ -42,17 +42,9 @@ public class RobotContainer {
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
 
-    //Deadzone
-    double deadZone(double control) {
-        if (Math.abs(control) < Constants.DEAD_ZONE) {
-            return 0.0;
-        }
-        return control;
-    }
 
     // Dashboard inputs
-    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
-
+//    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
     // private final LoggedDashboardChooser<Command> autoChooser;
 //  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
@@ -97,17 +89,14 @@ public class RobotContainer {
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
-                        () -> {
-                            var input = joystick.getY();
-                            return input;
+                        () -> { // x forward is front, -x is backward
+                            return joystick.getY();
                         },
-                        () -> {
-                            var input = joystick.getX();
-                            return input;
+                        () -> { // y+ is to the left, y- is to the right
+                            return joystick.getX();
                         },
-                        () -> {
-                            var input = joystick.getTwist();
-                            return input;
+                        () -> { // z+ is rotating counterclockwise
+                            return joystick.getTwist();
                         }
                 )
         );
