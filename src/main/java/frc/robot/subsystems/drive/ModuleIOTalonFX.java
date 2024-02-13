@@ -60,32 +60,33 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveSparkMax = new CANSparkMax(6, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(5, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(1);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(90+180-10+180); // MUST BE CALIBRATED
+        driveSparkMax.setInverted(true);
         break;
       case FRONT_RIGHT:
-        driveSparkMax = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
-        turnSparkMax = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
+        driveSparkMax = new CANSparkMax(8, CANSparkLowLevel.MotorType.kBrushless);
+        turnSparkMax = new CANSparkMax(7, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(2);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(225+180); // MUST BE CALIBRATED
         break;
       case BACK_LEFT:
         driveSparkMax = new CANSparkMax(1, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(2, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(3);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(82.33+180); // MUST BE CALIBRATED
         break;
       case BACK_RIGHT:
         driveSparkMax = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(4);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(165); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
     }
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
 
-    turnAbsolutePosition = cancoder.getAbsolutePosition();
+    turnAbsolutePosition = cancoder.getPosition();
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         turnAbsolutePosition);
@@ -129,7 +130,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     inputs.driveCurrentAmps = new double[]{driveSparkMax.getOutputCurrent()};
 
     inputs.turnAbsolutePosition = new Rotation2d(driveEncoder.getPosition() * 2.0 * Math.PI).minus(absoluteEncoderOffset);
-    inputs.turnPosition = new Rotation2d(Rotation2d.fromRotations(turnRelativeEncoder.getPosition() / TURN_GEAR_RATIO).getRadians() % Math.PI);
+    inputs.turnPosition = new Rotation2d(Rotation2d.fromRotations(turnRelativeEncoder.getPosition() / TURN_GEAR_RATIO).getRadians() % (Math.PI * 2.0));
     //inputs.turnPosition = Rotation2d.fromRotations(turnRelativeEncoder.getPosition() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity()) / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage();

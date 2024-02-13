@@ -47,7 +47,7 @@ public class Module {
 
         driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
         driveFeedback = new PIDController(0.05, 0.0, 0.0);
-        turnFeedback = new PIDController(7, 0.0, 0.0);
+        turnFeedback = new PIDController(3, 0.0, 0.0);
 
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);

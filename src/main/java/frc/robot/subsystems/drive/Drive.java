@@ -57,7 +57,7 @@ public class Drive extends SubsystemBase {
     }
 
     public void periodic() {
-        gyroIO.updateInputs(gyroInputs);
+//        gyroIO.updateInputs(gyroInputs);
         for (var module : modules) {
             module.periodic();
         }
