@@ -9,6 +9,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private double speed;
     MotorController leftClimberMotor;
     MotorController rightClimberMotor;
+
     public ClimberSubsystem() {
         this.leftClimberMotor = new Victor(Constants.Climber.leftClimbMotorChannel);
         this.rightClimberMotor = new Victor(Constants.Climber.rightClimbMotorChannel);

@@ -1,11 +1,5 @@
 package frc.robot.subsystems.drive;
 
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.pathfinding.Pathfinding;
-// import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-// import com.pathplanner.lib.util.PathPlannerLogging;
-// import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,17 +9,19 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.Constants.WheelModule.*;
 
 
 // import frc.robot.util.LocalADStarAK;
 
 
 public class Drive extends SubsystemBase {
-    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(1.5);
+    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
     private static final double DRIVE_BASE_RADIUS =
@@ -36,14 +32,11 @@ public class Drive extends SubsystemBase {
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-    private final ShuffleboardTab FLTab = Shuffleboard.getTab("FL");
-    private final ShuffleboardTab FRTab = Shuffleboard.getTab("FR");
-    private final ShuffleboardTab BLTab = Shuffleboard.getTab("BL");
-    private final ShuffleboardTab BRTab = Shuffleboard.getTab("BR");
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     private Pose2d pose = new Pose2d();
     private Rotation2d lastGyroRotation = new Rotation2d();
+    private StructArrayPublisher<SwerveModuleState> publisher;
 
     public Drive(
             GyroIO gyroIO,
@@ -52,37 +45,19 @@ public class Drive extends SubsystemBase {
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
-        modules[0] = new Module(flModuleIO, 0);
-        modules[1] = new Module(frModuleIO, 1);
-        modules[2] = new Module(blModuleIO, 2);
-        modules[3] = new Module(brModuleIO, 3);
+        modules[FRONT_LEFT] = new Module(flModuleIO, 0, "FL");
+        modules[FRONT_RIGHT] = new Module(frModuleIO, 1, "FR");
+        modules[BACK_LEFT] = new Module(blModuleIO, 2, "BL");
+        modules[BACK_RIGHT] = new Module(brModuleIO, 3, "BR");
 
-        // Configure AutoBuilder for PathPlanner
-        // AutoBuilder.configureHolonomic(
-        //     this::getPose,
-        //     this::setPose,
-        //     () -> kinematics.toChassisSpeeds(getModuleStates()),
-        //     this::runVelocity,
-        //     new HolonomicPathFollowerConfig(
-        //         MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-        //     () ->
-        //         DriverStation.getAlliance().isPresent()
-        //             && DriverStation.getAlliance().get() == Alliance.Red,
-        //     this);
-        // Pathfinding.setPathfinder(new LocalADStarAK());
-        // PathPlannerLogging.setLogActivePathCallback(
-        //     (activePath) -> {
-        //       Logger.recordOutput(
-        //           "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-        //     });
-        // PathPlannerLogging.setLogTargetPoseCallback(
-        //     (targetPose) -> {
-        //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-        //     });
+        publisher = NetworkTableInstance
+                .getDefault()
+                .getStructArrayTopic("MyStates", SwerveModuleState.struct)
+                .publish();
     }
 
     public void periodic() {
-        gyroIO.updateInputs(gyroInputs);
+//        gyroIO.updateInputs(gyroInputs);
         for (var module : modules) {
             module.periodic();
         }
@@ -108,25 +83,21 @@ public class Drive extends SubsystemBase {
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
+        //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
         if (gyroInputs.connected) {
             // If the gyro is connected, replace the theta component of the twist
             // with the change in angle since the last loop cycle.
-            twist =
-                    new Twist2d(
-                            twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
+            twist = new Twist2d(
+                    twist.dx,
+                    twist.dy,
+                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+            );
             lastGyroRotation = gyroInputs.yawPosition;
         }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
+//
 
-        FLTab.add("Real Angle", modules[0].getState().angle);
-        FLTab.add("Real Velocity", modules[0].getState().speedMetersPerSecond);
-        FRTab.add("Real Angle", modules[1].getState().angle);
-        FRTab.add("Real Velocity", modules[1].getState().speedMetersPerSecond);
-        BLTab.add("Real Angle", modules[2].getState().angle);
-        BLTab.add("Real Velocity", modules[2].getState().speedMetersPerSecond);
-        BRTab.add("Real Angle", modules[3].getState().angle);
-        BRTab.add("Real Velocity", modules[3].getState().speedMetersPerSecond);
     }
 
     /**
@@ -149,20 +120,18 @@ public class Drive extends SubsystemBase {
 
         optimizedSetpointStates = setpointStates;
 
+        publisher.set(optimizedSetpointStates);
+
+
         // Log setpoint states
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-        FLTab.add("Target Angle", setpointStates[0].angle);
-        FLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        FRTab.add("Target Angle", setpointStates[0].angle);
-        FRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        BLTab.add("Target Angle", setpointStates[0].angle);
-        BLTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
-        BRTab.add("Target Angle", setpointStates[0].angle);
-        BRTab.add("Target Velocity", setpointStates[0].speedMetersPerSecond);
+
     }
 
-    /** Stops the drive. */
+    /**
+     * Stops the drive.
+     */
     public void stop() {
         runVelocity(new ChassisSpeeds());
     }
@@ -180,14 +149,27 @@ public class Drive extends SubsystemBase {
         stop();
     }
 
-    /** Runs forwards at the commanded voltage. */
+    public void straightenWheels() {
+        Rotation2d[] headings = new Rotation2d[4];
+        for (int i = 0; i < 4; i++) {
+            headings[i] = new Rotation2d(0);
+        }
+        kinematics.resetHeadings(headings);
+        stop();
+    }
+
+    /**
+     * Runs forwards at the commanded voltage.
+     */
     public void runCharacterizationVolts(double volts) {
         for (int i = 0; i < 4; i++) {
             modules[i].runCharacterization(volts);
         }
     }
 
-    /** Returns the average drive velocity in radians/sec. */
+    /**
+     * Returns the average drive velocity in radians/sec.
+     */
     public double getCharacterizationVelocity() {
         double driveVelocityAverage = 0.0;
         for (var module : modules) {
@@ -196,7 +178,9 @@ public class Drive extends SubsystemBase {
         return driveVelocityAverage / 4.0;
     }
 
-    /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+    /**
+     * Returns the module states (turn angles and drive velocities) for all of the modules.
+     */
 //    @AutoLogOutput(key = "SwerveStates/Measured")
     private SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -206,39 +190,51 @@ public class Drive extends SubsystemBase {
         return states;
     }
 
-    /** Returns the current odometry pose. */
+    /**
+     * Returns the current odometry pose.
+     */
 //    @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
         return pose;
     }
 
-    /** Returns the current odometry rotation. */
+    /**
+     * Returns the current odometry rotation.
+     */
     public Rotation2d getRotation() {
-        return pose.getRotation();
+        return gyroInputs.yawPosition;
     }
 
-    /** Resets the current odometry pose. */
+    /**
+     * Resets the current odometry pose.
+     */
     public void setPose(Pose2d pose) {
         this.pose = pose;
     }
 
-    /** Returns the maximum linear speed in meters per sec. */
+    /**
+     * Returns the maximum linear speed in meters per sec.
+     */
     public double getMaxLinearSpeedMetersPerSec() {
         return MAX_LINEAR_SPEED;
     }
 
-    /** Returns the maximum angular speed in radians per sec. */
+    /**
+     * Returns the maximum angular speed in radians per sec.
+     */
     public double getMaxAngularSpeedRadPerSec() {
         return MAX_ANGULAR_SPEED;
     }
 
-    /** Returns an array of module translations. */
+    /**
+     * Returns an array of module translations.
+     */
     public static Translation2d[] getModuleTranslations() {
-        return new Translation2d[] {
-                new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-                new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-                new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
+        return new Translation2d[]{
+                new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // FL
+                new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0), // FR
+                new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0), // BL
+                new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0) // BR
         };
     }
 }
