@@ -96,7 +96,7 @@ public class RobotContainer {
                             return -joystick.getX();
                         },
                         () -> { // z+ is rotating counterclockwise
-                            return joystick.getTwist();
+                            return -joystick.getTwist();
                         }
                 )
         );

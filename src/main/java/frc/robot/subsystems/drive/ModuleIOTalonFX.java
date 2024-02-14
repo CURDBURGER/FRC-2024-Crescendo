@@ -51,7 +51,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   private final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
-  private final boolean isTurnMotorInverted = true;
+  private  boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIOTalonFX(int index) {
@@ -60,20 +60,20 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveSparkMax = new CANSparkMax(6, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(5, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(1);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(90+180-10+180); // MUST BE CALIBRATED
-        driveSparkMax.setInverted(true);
+        absoluteEncoderOffset = Rotation2d.fromDegrees(260); // MUST BE CALIBRATED
+        driveSparkMax.setInverted(false);
         break;
       case FRONT_RIGHT:
         driveSparkMax = new CANSparkMax(8, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(7, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(2);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(225+180); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(45); // MUST BE CALIBRATED
         break;
       case BACK_LEFT:
         driveSparkMax = new CANSparkMax(1, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(2, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(3);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(82.33+180); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(262.33); // MUST BE CALIBRATED
         break;
       case BACK_RIGHT:
         driveSparkMax = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
