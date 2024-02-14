@@ -4,9 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -51,7 +55,8 @@ public class RobotContainer {
 
 
     // Dashboard inputs
-//    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
+    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
+
     // private final LoggedDashboardChooser<Command> autoChooser;
 //  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
 
@@ -153,8 +158,14 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         //Getting smart-dashboard value
+        autoChooser.addOption("Leave", AutoChoice.Leave);
+        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
+        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
+        autoChooser.setDefaultOption("Auto Choice", AutoChoice.Leave);
+
+        tab.add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
         AutoChoice autoChoice = autoChooser.getSelected();
-        SmartDashboard.putString("Current Auto Start Config", autoChoice.name());
+
 
         Command command;
         switch (autoChoice) {
