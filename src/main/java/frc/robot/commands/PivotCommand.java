@@ -5,21 +5,25 @@ import frc.robot.subsystems.pickup.PivotSubsystem;
 
 public class PivotCommand extends Command {
     private final PivotSubsystem pivotSubsystem;
-    private final double speed;
+    private boolean setOut;
 
-    public PivotCommand(PivotSubsystem pivotSubsystem, double speed) {
+    public PivotCommand(PivotSubsystem pivotSubsystem, boolean setOut) {
         this.pivotSubsystem = pivotSubsystem;
-        this.speed = speed;
+        this.setOut = setOut;
     }
 
     @Override
     public void initialize() {
-        pivotSubsystem.setPivotPosition(PivotSubsystem.PivotPosition.out);
+        pivotSubsystem.setPivotPosition(PivotSubsystem.PivotPosition.in);
     }
 
     @Override
     public void execute() {
-
+        if(setOut){
+            pivotSubsystem.setPivotPosition(PivotSubsystem.PivotPosition.out);
+        } else{
+            pivotSubsystem.setPivotPosition(PivotSubsystem.PivotPosition.in);
+        }
     }
 
     @Override

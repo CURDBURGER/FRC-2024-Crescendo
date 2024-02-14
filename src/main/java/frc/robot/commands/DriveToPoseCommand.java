@@ -21,7 +21,7 @@ public class DriveToPoseCommand extends Command {
         this.drive = drive;
         this.speed = speed;
         this.distance = distance;
-        this.direction = direction;
+        this.direction = Math.toRadians(direction);
         addRequirements(drive);
     }
 

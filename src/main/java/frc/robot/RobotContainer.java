@@ -7,20 +7,23 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
+import frc.robot.commands.autoCommands.FourPieceCommand;
+import frc.robot.commands.autoCommands.LeaveCommand;
+import frc.robot.commands.autoCommands.TwoPieceCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
+import frc.robot.subsystems.pickup.PivotSubsystem;
 
 import static frc.robot.Constants.WheelModule.*;
 
@@ -37,6 +40,10 @@ public class RobotContainer {
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
     //private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
+
+    private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
@@ -64,7 +71,9 @@ public class RobotContainer {
     }
 
     public void robotEnabled() {
-        getManualShoot();
+//        getManualShoot();
+        new PivotCommand(pivotSubsystem, false);
+
     }
 
     /**
@@ -111,10 +120,6 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
-        // return autoChooser.get();
-        return null;
-    }
 
     private Command getAutoShoot() {
         return new SequentialCommandGroup(
@@ -145,4 +150,28 @@ public class RobotContainer {
                 )
         );
     }
+
+    public Command getAutonomousCommand() {
+        //Getting smart-dashboard value
+        AutoChoice autoChoice = autoChooser.getSelected();
+        SmartDashboard.putString("Current Auto Start Config", autoChoice.name());
+
+        Command command;
+        switch (autoChoice) {
+            case Leave:
+                command = LeaveCommand.create(drive);
+                break;
+            case TwoPiece:
+                command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                break;
+            case FourPiece:
+                command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                break;
+            default:
+                command = new SequentialCommandGroup();
+        }
+        return new ParallelCommandGroup(/*new LightCommand(lightsSubsystem),*/ command);
+    }
 }
+
+

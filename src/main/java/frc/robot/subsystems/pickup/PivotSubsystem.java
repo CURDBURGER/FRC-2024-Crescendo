@@ -13,7 +13,6 @@ public class PivotSubsystem extends SubsystemBase {
     }
 
     private final MotorController pivotMotor;
-    private double speed;
     private final Encoder pivotEncoder;
 
     private PivotPosition pivotPosition = PivotPosition.in;
@@ -38,7 +37,6 @@ public class PivotSubsystem extends SubsystemBase {
         } else {
             pivotMotor.set(0);
         }
-        pivotMotor.set(speed);
     }
 }
 
