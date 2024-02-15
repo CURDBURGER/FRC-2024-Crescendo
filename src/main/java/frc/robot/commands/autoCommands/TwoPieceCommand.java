@@ -16,35 +16,34 @@ public class TwoPieceCommand extends Command{
     public static Command create(Drive drive, IntakeSubsystem intakeSubsystem, PivotSubsystem pivotSubsystem, ShooterSubsystem shooterSubsystem) {
         return new SequentialCommandGroup(
                 new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, .5),
-                        new TimerCommand(250)
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
+                        new TimerCommand(Constants.Shooter.revTime)
                 ),
                 new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, .5),
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(250)
+                        new TimerCommand(Constants.Shooter.outtakeTime)
                 ),
                 new ParallelCommandGroup(
-                        new DriveToPoseCommand(drive, 5, 2, 0),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote, 0),
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, 3, 10, 0),
-                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(1000)
+                        new DriveToPoseCommand(drive, Constants.Auto.slowSpeed, Constants.Auto.noteRadius, 0),
+                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelCommandGroup(
-                        new DriveToPoseCommand(drive, 5, 2, 180),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + Constants.Auto.noteRadius, 180),
                         new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, .5),
-                        new TimerCommand(250)
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
+                        new TimerCommand(Constants.Shooter.revTime)
                 ),
                 new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, .5),
+                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(250)
+                        new TimerCommand(Constants.Shooter.outtakeTime)
                 )
         );
     }

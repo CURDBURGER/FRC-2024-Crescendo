@@ -29,6 +29,8 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
 
+import java.util.concurrent.ConcurrentMap;
+
 import static frc.robot.Constants.WheelModule.*;
 
 /**
@@ -55,7 +57,6 @@ public class RobotContainer {
 
 
     // Dashboard inputs
-    private final ShuffleboardTab tab = Shuffleboard.getTab("General");
 
     // private final LoggedDashboardChooser<Command> autoChooser;
 //  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
@@ -89,15 +90,26 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Climber
-        controller.start().whileTrue(new ClimberCommand(climberSubsystem, 1.0));
-        controller.back().whileTrue(new ClimberCommand(climberSubsystem, -1.0));
+        joystick.button(12).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.climberSpeed));
+        joystick.button(11).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
+        controller.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.climberSpeed));
+        controller.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
 
         // Auto shoot
+        joystick.trigger().whileTrue(getAutoShoot());
         controller.a().whileTrue(getAutoShoot());
 
         // Manual shoot
-        controller.x().whileTrue(getManualShoot());
-        joystick.button(11).whileTrue(getManualShoot());
+        joystick.button(2).whileTrue(getManualShoot());
+        controller.y().whileTrue(getManualShoot());
+
+        //Intake
+        joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(3).onTrue(new PivotCommand(pivotSubsystem, true));
+        joystick.button(3).onFalse(new PivotCommand(pivotSubsystem, false));
+        controller.b().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
+        controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
 
         // Drive
         drive.setDefaultCommand(
@@ -114,10 +126,6 @@ public class RobotContainer {
                         }
                 )
         );
-
-        joystick.button(12).onTrue(Commands.runOnce(drive::stopWithX, drive));
-        joystick.button(11).onTrue(Commands.runOnce(drive::straightenWheels, drive));
-        //joystick.button(8).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
     }
 
     /**
@@ -135,7 +143,7 @@ public class RobotContainer {
                 ),
                 new ParallelRaceGroup(
                         //new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -1),
+                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 )
         );
@@ -150,7 +158,7 @@ public class RobotContainer {
                 ),
                 new ParallelRaceGroup(
                         new ManualShooterCommand(shooterSubsystem, joystick),
-                        new IntakeCommand(intakeSubsystem, -1),
+                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 )
         );
@@ -163,7 +171,7 @@ public class RobotContainer {
         autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
         autoChooser.setDefaultOption("Auto Choice", AutoChoice.Leave);
 
-        tab.add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+        Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
         AutoChoice autoChoice = autoChooser.getSelected();
 
 
