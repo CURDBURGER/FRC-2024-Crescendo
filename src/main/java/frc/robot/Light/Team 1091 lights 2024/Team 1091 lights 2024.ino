@@ -31,6 +31,7 @@ void setup() {
   pinMode(yellowButtonPin, INPUT);
   
 }
+//start positions of each light
 int currentLedBlue = 0;
 int currentLedRed = 20;
 int currentLedOrange = 40;
@@ -39,10 +40,12 @@ int currentLedClear = 60;
 unsigned long lastChange = 0;
 
 void loop() {
+  //sets variable to the state of its respective pin
   blackButtonState = digitalRead(blackButtonPin);
   yellowButtonState = digitalRead(yellowButtonPin);
 
   delay(33);
+  //changes position of lights by 1 every second
   if (lastChange < millis() + 1000) {
     currentLedBlue++;
     currentLedRed++;
@@ -51,6 +54,7 @@ void loop() {
     currentLedClear++;
     lastChange = millis();
 
+  //resets lights to 0 if past a certain value
   if (currentLedBlue >= NUM_LEDS) currentLedBlue = 0;
   if (currentLedRed >= NUM_LEDS) currentLedRed = 0;
   if (currentLedOrange >= NUM_LEDS) currentLedOrange = 0;
@@ -59,7 +63,7 @@ void loop() {
 
   if (yellowButtonState == HIGH) {
   // read the state of the pushbutton value:
-    // turn LED to orange no matter what the blackButtonState variable is
+    // diplays the orange red and blue leds no matter what the blackButtonState variable is
     strip.setPixelColor(currentLedBlue, 0, 0, 255);
     strip.setPixelColor(currentLedRed, 225, 0, 0);
     strip.setPixelColor(currentLedOrange, 225, 25, 0);
@@ -70,12 +74,12 @@ void loop() {
   } else {
     // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
     if (blackButtonState == HIGH) {
-      // turn LED to blue:
+      // display the alliance led as blue and the clear led
       strip.setPixelColor(currentLedAlliance, 0, 0, 255);
       strip.setPixelColor(currentLedClear, 0, 0, 0);
       strip.show();
     } else {
-        // turn LED to red
+        // display the alliance led as red and the clear led
       strip.setPixelColor(currentLedAlliance, 225, 0, 0);
       strip.setPixelColor(currentLedClear, 0, 0, 0);
       strip.show();
