@@ -60,6 +60,7 @@
              depthToTag.setDouble(speakerTag.getX());
              horizontalDistanceToTag.setDouble(speakerTag.getY());
              yawToTag.setDouble(speakerTag.getRotation().getAngle());
+
              if (Math.abs(speakerTag.getY()) > Constants.Align.errorMargin) {
                  if (speakerTag.getY() > 0) {
                      yVelocity = Constants.Align.alignSpeed;
