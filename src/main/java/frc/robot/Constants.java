@@ -47,6 +47,14 @@ public final class Constants {
         public static double slowSpeed = 3;
     }
 
+    public static final class Align {
+        public static final int redShooterID = 4;
+        public static final int blueShooterID = 7;
+        public static final double errorMargin = 0.05;
+        public static final double shooterRange = 2;
+        public static double alignSpeed;
+    }
+
 
     public static final double DEAD_ZONE = 0.02;
 }

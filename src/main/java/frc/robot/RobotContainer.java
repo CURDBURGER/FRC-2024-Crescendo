@@ -74,6 +74,13 @@ public class RobotContainer {
         );
         // Configure the button bindings
         configureButtonBindings();
+
+        autoChooser.addOption("Leave", AutoChoice.Leave);
+        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
+        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
+        autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
+
+        Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
     }
 
     public void robotEnabled() {
@@ -166,14 +173,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         //Getting smart-dashboard value
-        autoChooser.addOption("Leave", AutoChoice.Leave);
-        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
-        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
-        autoChooser.setDefaultOption("Auto Choice", AutoChoice.Leave);
-
-        Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
         AutoChoice autoChoice = autoChooser.getSelected();
-
 
         Command command;
         switch (autoChoice) {

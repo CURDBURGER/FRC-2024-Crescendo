@@ -4,6 +4,9 @@
  import edu.wpi.first.wpilibj2.command.SubsystemBase;
  import org.photonvision.PhotonCamera;
  import org.photonvision.targeting.MultiTargetPNPResult;
+ import org.photonvision.targeting.PhotonTrackedTarget;
+
+ import java.util.List;
 
  /**
   *
@@ -11,7 +14,8 @@
  public class AprilTagSubsystem extends SubsystemBase {
 
      PhotonCamera camera;
-     MultiTargetPNPResult targets = null;
+     MultiTargetPNPResult multiTargets = null;
+     List<PhotonTrackedTarget> targets = null;
 
      public AprilTagSubsystem() {
          camera = new PhotonCamera("photonvision");
@@ -24,9 +28,10 @@
          var result = camera.getLatestResult();
 
  // Get a list of currently tracked targets.
-         targets = result.getMultiTagResult();
-
-
+         multiTargets = result.getMultiTagResult();
+         if(result.hasTargets()){
+             targets = result.getTargets();
+         }
      }
 
      @Override
@@ -37,7 +42,9 @@
 
      // Put methods for controlling this subsystem
      // here. Call these from Commands.
-     public MultiTargetPNPResult getTargets() {
-         return targets;
+     public MultiTargetPNPResult getMultiTargetPNPResults() {
+         return multiTargets;
      }
+
+     public List<PhotonTrackedTarget> getTargets(){return targets;}
  }
