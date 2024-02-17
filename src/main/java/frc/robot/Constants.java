@@ -32,6 +32,8 @@ public final class Constants {
         public final static int pivotMotor = 4;
         public final static int pivotEncoder1 = 0;
         public final static int pivotEncoder2 = 1;
+        public final static int outEncoderPosition = 245;
+        public final static int inEncoderPosition = 0;
     }
 
     public static final class Auto {
@@ -43,8 +45,8 @@ public final class Constants {
         public final static double yDistanceToNote = 1.45;
         public final static double directionToNote = Math.atan(yDistanceToNote/xDistanceToNote);
         public static double diagonalDistanceToNote  = Math.hypot(xDistanceToNote, yDistanceToNote);
-        public static double normalSpeed = 5;
-        public static double slowSpeed = 3;
+        public static double normalSpeed = 2.6;
+        public static double slowSpeed = 1.3;
     }
 
     public static final class Align {
@@ -52,7 +54,7 @@ public final class Constants {
         public static final int blueShooterID = 7;
         public static final double errorMargin = 0.05;
         public static final double shooterRange = .75;
-        public static double alignSpeed = 5;
+        public static double alignSpeed = 2.6;
     }
 
 

@@ -30,9 +30,9 @@ public class PivotSubsystem extends SubsystemBase {
     public void periodic() {
 
         var position = pivotEncoder.get();
-        if (pivotPosition == PivotPosition.out && position < 245) {
+        if (pivotPosition == PivotPosition.out && position < Constants.NotePickup.outEncoderPosition) {
             pivotMotor.set(0.25);
-        } else if (pivotPosition == pivotPosition.in && position > 0) {
+        } else if (pivotPosition == pivotPosition.in && position > Constants.NotePickup.inEncoderPosition) {
             pivotMotor.set(-0.25);
         } else {
             pivotMotor.set(0);
