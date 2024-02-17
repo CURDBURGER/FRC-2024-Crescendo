@@ -21,6 +21,7 @@ public class ClimberSubsystem extends SubsystemBase {
         this.rightSpeed = rightSpeed;
     }
 
+    //MAKE IT SO YOU CAN control them alone
     @Override
     public void periodic() {
         var leftSpeed = this.leftSpeed;

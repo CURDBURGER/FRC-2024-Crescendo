@@ -34,6 +34,8 @@ public final class Constants {
         public final static int pivotEncoder2 = 1;
         public final static int outEncoderPosition = 245;
         public final static int inEncoderPosition = 0;
+        public static double pivotSpeed = .25;
+        public static int lmiitSwitch = 4;
     }
 
     public static final class Auto {
