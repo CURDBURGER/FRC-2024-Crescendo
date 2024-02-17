@@ -51,8 +51,8 @@ public final class Constants {
         public static final int redShooterID = 4;
         public static final int blueShooterID = 7;
         public static final double errorMargin = 0.05;
-        public static final double shooterRange = 2;
-        public static double alignSpeed;
+        public static final double shooterRange = .75;
+        public static double alignSpeed = 5;
     }
 
 

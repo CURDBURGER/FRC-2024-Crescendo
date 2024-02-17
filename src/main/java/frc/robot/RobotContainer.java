@@ -101,6 +101,10 @@ public class RobotContainer {
         joystick.button(11).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
         controller.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.climberSpeed));
         controller.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
+        controller.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, true));
+        controller.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, true));
+        controller.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, false));
+        controller.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, false));
 
         // Auto shoot
         joystick.trigger().whileTrue(getAutoShoot());

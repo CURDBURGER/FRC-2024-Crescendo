@@ -3,13 +3,15 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimberSubsystem;
 
-public class ClimberCommand extends Command {
+public class SingleClimberCommand extends Command {
     private final ClimberSubsystem climberSubsystem;
     private final double speed;
+    private final boolean isRight;
 
-    public ClimberCommand(ClimberSubsystem climberSubsystem, double speed) {
+    public SingleClimberCommand(ClimberSubsystem climberSubsystem, double speed, boolean isRight) {
         this.climberSubsystem = climberSubsystem;
         this.speed = speed;
+        this.isRight = isRight;
         addRequirements(climberSubsystem);
     }
 
@@ -19,7 +21,11 @@ public class ClimberCommand extends Command {
 
     @Override
     public void execute() {
-        climberSubsystem.setClimberSpeed(speed, speed);
+        if (isRight){
+            climberSubsystem.setClimberSpeed(0, speed);
+        } else{
+            climberSubsystem.setClimberSpeed(speed, 0);
+        }
     }
 
     @Override

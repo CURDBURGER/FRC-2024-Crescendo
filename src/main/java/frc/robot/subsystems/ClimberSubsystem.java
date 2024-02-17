@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ClimberSubsystem extends SubsystemBase {
-    private double speed;
+    private double leftSpeed;
+    private double rightSpeed;
     MotorController leftClimberMotor;
     MotorController rightClimberMotor;
 
@@ -15,15 +16,17 @@ public class ClimberSubsystem extends SubsystemBase {
         this.rightClimberMotor = new Victor(Constants.Climber.rightClimbMotorChannel);
     }
 
-    public void setClimberSpeed(double speed) {
-        this.speed = speed;
+    public void setClimberSpeed(double leftSpeed, double rightSpeed) {
+        this.leftSpeed = leftSpeed;
+        this.rightSpeed = rightSpeed;
     }
 
     @Override
     public void periodic() {
-        var speed = this.speed;
-        leftClimberMotor.set(-speed);
-        rightClimberMotor.set(-speed);
+        var leftSpeed = this.leftSpeed;
+        var rightSpeed = this.rightSpeed;
+        leftClimberMotor.set(-leftSpeed);
+        rightClimberMotor.set(-rightSpeed);
 
     }
 }
