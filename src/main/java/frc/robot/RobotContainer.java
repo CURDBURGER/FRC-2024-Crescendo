@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.ColorSensorSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
@@ -26,7 +27,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
 //  private final Shooter shooter;
-
+    private final ColorSensorSubsystem colorSensorSubsystem;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -46,6 +47,7 @@ public class RobotContainer {
                         new ModuleIOSparkMax(2),
                         new ModuleIOSparkMax(3)
         );
+        colorSensorSubsystem = new ColorSensorSubsystem();
 //        shooter = new Shooter(new ShooterIOSparkMax());
 
         // flywheel = new Flywheel(new FlywheelIOSparkMax());
@@ -56,6 +58,8 @@ public class RobotContainer {
         // new ModuleIOTalonFX(2),
         // new ModuleIOTalonFX(3));
         // flywheel = new Flywheel(new FlywheelIOTalonFX());
+
+
 
     // Set up auto routines
     // NamedCommands.registerCommand(
