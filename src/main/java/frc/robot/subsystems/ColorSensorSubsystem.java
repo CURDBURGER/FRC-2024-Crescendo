@@ -16,7 +16,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
      * detect pre-configured colors.
      */
 
-    private final ColorSensorV3 m_colorSensor = new ColorSensorV3(I2C.Port.kMXP);
+    private final ColorSensorV3 m_colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 
     /**
      * A Rev Color Match object is used to register and detect known colors. This can
