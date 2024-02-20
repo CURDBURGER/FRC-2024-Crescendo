@@ -1,27 +1,34 @@
 package frc.robot.subsystems.pickup;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
+import com.ctre.phoenix;
 
 public class PivotSubsystem extends SubsystemBase {
     public enum PivotPosition {
         in, out;
     }
 
-    private final MotorController pivotMotor;
+    private final Victor pivotMotor;
     private final Encoder pivotEncoder;
     private final DigitalInput limitSwitch;
+    private static ShuffleboardTab tab = Shuffleboard.getTab("General");
+    private static GenericEntry encoderPosition = tab.add("Encoder Position", 0.0).getEntry();
+
+
 
     private PivotPosition pivotPosition = PivotPosition.in;
 
     public PivotSubsystem() {
         this.pivotMotor = new Victor(Constants.NotePickup.pivotMotor);
-        this.pivotEncoder = new Encoder(Constants.NotePickup.pivotEncoder1, Constants.NotePickup.pivotEncoder2);
+        this.pivotEncoder = new Encoder(Constants.NotePickup.pivotEncoder1, Constants.NotePickup.pivotEncoder2, Constants.NotePickup.pivotEncoder3);
         this.limitSwitch = new DigitalInput(Constants.NotePickup.lmiitSwitch);
     }
 
@@ -31,14 +38,22 @@ public class PivotSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+//        encoderPosition.setDouble(pivotEncoder.get());
         if (limitSwitch.get()) {
-            pivotEncoder.reset();
+//            pivotEncoder.reset();
         }
 
-        var position = pivotEncoder.get();
-        if (pivotPosition == PivotPosition.out && position < Constants.NotePickup.outEncoderPosition) {
+//        var position = pivotEncoder.get();
+//        if (pivotPosition == PivotPosition.out && position < Constants.NotePickup.outEncoderPosition) {
+//            pivotMotor.set(Constants.NotePickup.pivotSpeed);
+//        } else if (pivotPosition == pivotPosition.in && position > Constants.NotePickup.inEncoderPosition) {
+//            pivotMotor.set(-Constants.NotePickup.pivotSpeed);
+//        } else {
+//            pivotMotor.set(0);
+//        }
+        if (pivotPosition == PivotPosition.out) {
             pivotMotor.set(Constants.NotePickup.pivotSpeed);
-        } else if (pivotPosition == pivotPosition.in && position > Constants.NotePickup.inEncoderPosition) {
+        } else if (pivotPosition == pivotPosition.in) {
             pivotMotor.set(-Constants.NotePickup.pivotSpeed);
         } else {
             pivotMotor.set(0);

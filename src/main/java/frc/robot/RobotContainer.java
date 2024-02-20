@@ -111,16 +111,19 @@ public class RobotContainer {
         controller.a().whileTrue(getAutoShoot());
 
         // Manual shoot
-        joystick.button(2).whileTrue(getManualShoot());
-        controller.y().whileTrue(getManualShoot());
+        joystick.button(2).onTrue(getManualShoot());
+        controller.x().onTrue(getManualShoot());
 
         //Intake
-        joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        joystick.button(3).onTrue(new PivotCommand(pivotSubsystem, true));
-        joystick.button(3).onFalse(new PivotCommand(pivotSubsystem, false));
-        controller.b().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(5).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
+        joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
+        controller.y().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
         controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
+
+        joystick.button(8).whileTrue(getManualIntake());
+        controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
         drive.setDefaultCommand(
@@ -169,6 +172,20 @@ public class RobotContainer {
                 ),
                 new ParallelRaceGroup(
                         new ManualShooterCommand(shooterSubsystem, joystick),
+                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                        new TimerCommand(Constants.Shooter.outtakeTime)
+                )
+        );
+    }
+    private Command getManualIntake() {
+        return new SequentialCommandGroup(
+                // spin up
+                new ParallelRaceGroup(
+                        new ManualIntakeCommand(shooterSubsystem, joystick),
+                        new TimerCommand(Constants.Shooter.revTime)
+                ),
+                new ParallelRaceGroup(
+                        new ManualIntakeCommand(shooterSubsystem, joystick),
                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 )

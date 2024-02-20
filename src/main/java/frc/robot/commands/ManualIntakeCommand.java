@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class ManualShooterCommand extends Command {
+public class ManualIntakeCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
     private final CommandJoystick joystick;
 
-    public ManualShooterCommand(ShooterSubsystem shooterSubsystem, CommandJoystick joystick) {
+    public ManualIntakeCommand(ShooterSubsystem shooterSubsystem, CommandJoystick joystick) {
         this.shooterSubsystem = shooterSubsystem;
         this.joystick = joystick;
         addRequirements(shooterSubsystem);
@@ -21,7 +21,7 @@ public class ManualShooterCommand extends Command {
     @Override
     public void execute() {
         var speed = (-joystick.getThrottle() + 1) / 2;
-        shooterSubsystem.setShooterSpeed(-speed);
+        shooterSubsystem.setShooterSpeed(speed);
     }
 
     @Override

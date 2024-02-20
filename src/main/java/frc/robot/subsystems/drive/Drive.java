@@ -21,6 +21,8 @@ import static frc.robot.Constants.WheelModule.*;
 
 
 public class Drive extends SubsystemBase {
+
+    public static final boolean FIELD_ORIENTED = false;
     private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
@@ -79,12 +81,13 @@ public class Drive extends SubsystemBase {
         for (int i = 0; i < 4; i++) {
             wheelDeltas[i] = modules[i].getPositionDelta();
         }
+
         // The twist represents the motion of the robot since the last
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
         //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
-        if (gyroInputs.connected) {
+        if (FIELD_ORIENTED && gyroInputs.connected) {
             // If the gyro is connected, replace the theta component of the twist
             // with the change in angle since the last loop cycle.
             twist = new Twist2d(
