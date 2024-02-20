@@ -9,11 +9,11 @@ import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private final MotorController pickUpMotor;
+    private final PWMVictorSPX pickUpMotor;
     private double speed;
 
     public IntakeSubsystem() {
-        this.pickUpMotor = new Victor(Constants.NotePickup.inputMotorChannel);
+        this.pickUpMotor = new PWMVictorSPX(Constants.NotePickup.inputMotorChannel);
     }
 
     public void setPickUpMotorSpeed(double speed) {

@@ -13,8 +13,8 @@ public final class Constants {
     }
 
     public static class Climber {
-        public static final int leftClimbMotorChannel = 1;
-        public static final int rightClimbMotorChannel = 2;
+        public static final int leftClimbMotorChannel = 2;
+        public static final int rightClimbMotorChannel = 3;
         public static final double climberSpeed = .5;
     }
 
@@ -27,12 +27,12 @@ public final class Constants {
 
     // TODO
     public static final class NotePickup {
-        public final static int inputMotorChannel =16; //is a motor not a solenoid
-        public final static double inputMotorSpeed = .25; //make negative to reverse rotor
-        public final static int pivotMotor = 17;
+        public final static int inputMotorChannel =1; //is a motor not a solenoid
+        public final static double inputMotorSpeed = -.7; //make negative to reverse rotor
+        public final static int pivotMotor = 0;
         public final static int pivotEncoder1 = 1;
         public final static int pivotEncoder2 = 2;
-        public final static int outEncoderPosition = 90;
+        public final static int outEncoderPosition = -600;
         public final static int inEncoderPosition = 0;
         public static double pivotSpeed = .25;
         public static int lmiitSwitch = 4;

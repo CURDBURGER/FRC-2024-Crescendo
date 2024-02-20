@@ -112,6 +112,7 @@ public class RobotContainer {
 
         // Manual shoot
         joystick.button(2).onTrue(getManualShoot());
+        joystick.button(2).whileTrue(new ManualShooterCommand(shooterSubsystem, joystick));
         controller.x().onTrue(getManualShoot());
 
         //Intake
@@ -167,11 +168,11 @@ public class RobotContainer {
         return new SequentialCommandGroup(
                 // spin up
                 new ParallelRaceGroup(
-                        new ManualShooterCommand(shooterSubsystem, joystick),
+//                        new ManualShooterCommand(shooterSubsystem, joystick),
                         new TimerCommand(Constants.Shooter.revTime)
                 ),
                 new ParallelRaceGroup(
-                        new ManualShooterCommand(shooterSubsystem, joystick),
+//                        new ManualShooterCommand(shooterSubsystem, joystick),
                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 )
@@ -193,7 +194,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        //Getting smart-dashboard value
+        //Getting shuffleboard value
         AutoChoice autoChoice = autoChooser.getSelected();
 
         Command command;
