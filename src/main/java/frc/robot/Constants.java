@@ -9,12 +9,12 @@ public final class Constants {
         public static final int backRightMotorChannel = 14;
         public static final double autoShooterSpeed = .5;
         public static final int outtakeTime = 1000;
-        public static final int revTime = 1000;
+        public static final int revTime = 700;
     }
 
     public static class Climber {
-        public static final int leftClimbMotorChannel = 1;
-        public static final int rightClimbMotorChannel = 2;
+        public static final int leftClimbMotorChannel = 2;
+        public static final int rightClimbMotorChannel = 3;
         public static final double climberSpeed = .5;
     }
 
@@ -27,15 +27,16 @@ public final class Constants {
 
     // TODO
     public static final class NotePickup {
-        public final static int inputMotorChannel = 3; //is a motor not a solenoid
-        public final static double inputMotorSpeed = 0.8; //make negative to reverse rotor
-        public final static int pivotMotor = 4;
-        public final static int pivotEncoder1 = 0;
-        public final static int pivotEncoder2 = 1;
-        public final static int outEncoderPosition = 245;
+        public final static int inputMotorChannel =1; //is a motor not a solenoid
+        public final static double inputMotorSpeed = -.7; //make negative to reverse rotor
+        public final static int pivotMotor = 0;
+        public final static int pivotEncoder1 = 1;
+        public final static int pivotEncoder2 = 2;
+        public final static int outEncoderPosition = -600;
         public final static int inEncoderPosition = 0;
         public static double pivotSpeed = .25;
         public static int lmiitSwitch = 4;
+        public static int pivotEncoder3 = 3;
     }
 
     public static final class Auto {

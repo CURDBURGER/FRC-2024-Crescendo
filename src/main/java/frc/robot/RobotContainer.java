@@ -116,16 +116,20 @@ public class RobotContainer {
         controller.a().whileTrue(getAutoShoot());
 
         // Manual shoot
-        joystick.button(2).whileTrue(getManualShoot());
-        controller.y().whileTrue(getManualShoot());
+        joystick.button(2).onTrue(getManualShoot());
+        joystick.button(2).whileTrue(new ManualShooterCommand(shooterSubsystem, joystick));
+        controller.x().onTrue(getManualShoot());
 
         //Intake
-        joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        joystick.button(3).onTrue(new PivotCommand(pivotSubsystem, true));
-        joystick.button(3).onFalse(new PivotCommand(pivotSubsystem, false));
-        controller.b().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(5).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
+        joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
+        controller.y().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
         controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
+
+        joystick.button(8).whileTrue(getManualIntake());
+        controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
         drive.setDefaultCommand(
@@ -169,11 +173,25 @@ public class RobotContainer {
         return new SequentialCommandGroup(
                 // spin up
                 new ParallelRaceGroup(
-                        new ManualShooterCommand(shooterSubsystem, joystick),
+//                        new ManualShooterCommand(shooterSubsystem, joystick),
                         new TimerCommand(Constants.Shooter.revTime)
                 ),
                 new ParallelRaceGroup(
-                        new ManualShooterCommand(shooterSubsystem, joystick),
+//                        new ManualShooterCommand(shooterSubsystem, joystick),
+                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                        new TimerCommand(Constants.Shooter.outtakeTime)
+                )
+        );
+    }
+    private Command getManualIntake() {
+        return new SequentialCommandGroup(
+                // spin up
+                new ParallelRaceGroup(
+                        new ManualIntakeCommand(shooterSubsystem, joystick),
+                        new TimerCommand(Constants.Shooter.revTime)
+                ),
+                new ParallelRaceGroup(
+                        new ManualIntakeCommand(shooterSubsystem, joystick),
                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 )
@@ -181,7 +199,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        //Getting smart-dashboard value
+        //Getting shuffleboard value
         AutoChoice autoChoice = autoChooser.getSelected();
 
         Command command;
