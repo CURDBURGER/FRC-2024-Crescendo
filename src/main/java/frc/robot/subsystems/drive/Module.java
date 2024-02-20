@@ -6,8 +6,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 public class Module {
     private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
@@ -15,6 +16,11 @@ public class Module {
     private final ModuleIO io;
     private final ModuleIO.ModuleIOInputs inputs = new ModuleIO.ModuleIOInputs();
     private final int index;
+    private GenericEntry realAngle;
+    private GenericEntry realVelocity;
+    private GenericEntry targetAngle;
+    private GenericEntry targetVelocity;
+
 
     private final SimpleMotorFeedforward driveFeedforward;
     private final PIDController driveFeedback;
@@ -24,15 +30,24 @@ public class Module {
     private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
     private double lastPositionMeters = 0.0; // Used for delta calculation
 
-    public Module(ModuleIO io, int index) {
+
+    public Module(ModuleIO io, int index, String title) {
         this.io = io;
         this.index = index;
 
+        // Set up shuffleboard
+        var tab = Shuffleboard.getTab(title);
+        realAngle = tab.add("Real Angle" + title, 0).getEntry();
+        realVelocity = tab.add("Real Velocity" + title, 0).getEntry();
+        targetAngle = tab.add("Target Angle" + title, 0).getEntry();
+        targetVelocity = tab.add("Target Velocity" + title, 0).getEntry();
+
+
         // Constants here may change for SIM
 
-                driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
-                driveFeedback = new PIDController(0.05, 0.0, 0.0);
-                turnFeedback = new PIDController(7, 0.0, 0.0);
+        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
+        driveFeedback = new PIDController(0.05, 0.0, 0.0);
+        turnFeedback = new PIDController(3, 0.0, 0.0);
 
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
@@ -46,7 +61,6 @@ public class Module {
         // On first cycle, reset relative turn encoder
         // Wait until absolute angle is nonzero in case it wasn't initialized yet
         if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
-            // turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
             turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
             DriverStation.reportError(
                     "Drive/Module"
@@ -82,9 +96,16 @@ public class Module {
                                 + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
             }
         }
+
+        // Logging
+        realAngle.setDouble(getState().angle.getDegrees());
+        realVelocity.setDouble(getState().speedMetersPerSecond);
+
     }
 
-    /** Runs the module with the specified setpoint state. Returns the optimized state. */
+    /**
+     * Runs the module with the specified setpoint state. Returns the optimized state.
+     */
     public SwerveModuleState runSetpoint(SwerveModuleState state) {
         // Optimize state based on current angle
         // Controllers run in "periodic" when the setpoint is not null
@@ -94,10 +115,16 @@ public class Module {
         angleSetpoint = optimizedState.angle;
         speedSetpoint = optimizedState.speedMetersPerSecond;
 
+        // Logging
+        targetAngle.setDouble(angleSetpoint.getDegrees());
+        targetVelocity.setDouble(speedSetpoint);
+
         return optimizedState;
     }
 
-    /** Runs the module with the specified voltage while controlling to zero degrees. */
+    /**
+     * Runs the module with the specified voltage while controlling to zero degrees.
+     */
     public void runCharacterization(double volts) {
         // Closed loop turn control
         angleSetpoint = new Rotation2d();
@@ -107,7 +134,9 @@ public class Module {
         speedSetpoint = null;
     }
 
-    /** Disables all outputs to motors. */
+    /**
+     * Disables all outputs to motors.
+     */
     public void stop() {
         io.setTurnVoltage(0.0);
         io.setDriveVoltage(0.0);
@@ -117,7 +146,9 @@ public class Module {
         speedSetpoint = null;
     }
 
-    /** Sets whether brake mode is enabled. */
+    /**
+     * Sets whether brake mode is enabled.
+     */
     public void setBrakeMode(boolean enabled) {
         io.setDriveBrakeMode(enabled);
         io.setTurnBrakeMode(enabled);
@@ -132,34 +163,46 @@ public class Module {
     }
     /** Returns the current turn angle of the module. */
 
-    /** Returns the current drive position of the module in meters. */
+    /**
+     * Returns the current drive position of the module in meters.
+     */
     public double getPositionMeters() {
         return inputs.drivePositionRad * WHEEL_RADIUS;
     }
 
-    /** Returns the current drive velocity of the module in meters per second. */
+    /**
+     * Returns the current drive velocity of the module in meters per second.
+     */
     public double getVelocityMetersPerSec() {
         return inputs.driveVelocityRadPerSec * WHEEL_RADIUS;
     }
 
-    /** Returns the module position (turn angle and drive position). */
+    /**
+     * Returns the module position (turn angle and drive position).
+     */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getPositionMeters(), getAngle());
     }
 
-    /** Returns the module position delta since the last call to this method. */
+    /**
+     * Returns the module position delta since the last call to this method.
+     */
     public SwerveModulePosition getPositionDelta() {
         var delta = new SwerveModulePosition(getPositionMeters() - lastPositionMeters, getAngle());
         lastPositionMeters = getPositionMeters();
         return delta;
     }
 
-    /** Returns the module state (turn angle and drive velocity). */
+    /**
+     * Returns the module state (turn angle and drive velocity).
+     */
     public SwerveModuleState getState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
     }
 
-    /** Returns the drive velocity in radians/sec. */
+    /**
+     * Returns the drive velocity in radians/sec.
+     */
     public double getCharacterizationVelocity() {
         return inputs.driveVelocityRadPerSec;
     }
