@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.ColorSensorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
@@ -40,16 +41,17 @@ import static frc.robot.Constants.WheelModule.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
     // Subsystems
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+    private final ColorSensorSubsystem colorSensorSubsystem;
     //private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
-
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
@@ -72,6 +74,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(BACK_LEFT),
                 new ModuleIOTalonFX(BACK_RIGHT)
         );
+      
+        colorSensorSubsystem = new ColorSensorSubsystem();
+
         // Configure the button bindings
         configureButtonBindings();
 
@@ -196,5 +201,3 @@ public class RobotContainer {
         return new ParallelCommandGroup(/*new LightCommand(lightsSubsystem),*/ command);
     }
 }
-
-
