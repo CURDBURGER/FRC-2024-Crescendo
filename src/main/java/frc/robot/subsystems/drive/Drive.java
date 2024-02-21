@@ -35,6 +35,9 @@ public class Drive extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private GenericEntry gyroYawDebug;
+    private GenericEntry poseXDebug;
+    private GenericEntry poseYDebug;
+    private GenericEntry poseRotDebug;
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
 
@@ -60,6 +63,9 @@ public class Drive extends SubsystemBase {
                 .getStructArrayTopic("MyStates", SwerveModuleState.struct)
                 .publish();
         gyroYawDebug = Shuffleboard.getTab("General").add("Gyro Yaw", 0).getEntry();
+        poseXDebug = Shuffleboard.getTab("General").add("Pose X", 0).getEntry();
+        poseYDebug = Shuffleboard.getTab("General").add("Pose Y", 0).getEntry();
+        poseRotDebug = Shuffleboard.getTab("General").add("Pose Rotation", 0).getEntry();
     }
 
     public void periodic() {
@@ -103,6 +109,9 @@ public class Drive extends SubsystemBase {
         }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
+        poseXDebug.setDouble(pose.getX());
+        poseYDebug.setDouble(pose.getY());
+        poseRotDebug.setDouble(pose.getRotation().toDegrees());
 //
 
     }
