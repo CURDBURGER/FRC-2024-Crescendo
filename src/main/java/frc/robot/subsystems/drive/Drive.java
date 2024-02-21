@@ -9,9 +9,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.WheelModule.*;
@@ -32,6 +34,7 @@ public class Drive extends SubsystemBase {
 
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
+    private GenericEntry gyroYawDebug;
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
 
@@ -56,6 +59,7 @@ public class Drive extends SubsystemBase {
                 .getDefault()
                 .getStructArrayTopic("MyStates", SwerveModuleState.struct)
                 .publish();
+        gyroYawDebug = Shuffleboard.getTab("General").add("Gyro Yaw", 0).getEntry();
     }
 
     public void periodic() {
@@ -86,7 +90,7 @@ public class Drive extends SubsystemBase {
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
-        //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
+        gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
         if (FIELD_ORIENTED && gyroInputs.connected) {
             // If the gyro is connected, replace the theta component of the twist
             // with the change in angle since the last loop cycle.

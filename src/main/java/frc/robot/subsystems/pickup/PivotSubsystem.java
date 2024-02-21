@@ -3,9 +3,7 @@ package frc.robot.subsystems.pickup;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
-import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,7 +29,7 @@ public class PivotSubsystem extends SubsystemBase {
     public PivotSubsystem() {
         this.pivotMotor = new PWMVictorSPX(Constants.NotePickup.pivotMotor);
         this.pivotEncoder = new Encoder(Constants.NotePickup.pivotEncoder1, Constants.NotePickup.pivotEncoder2, Constants.NotePickup.pivotEncoder3);
-        this.limitSwitch = new DigitalInput(Constants.NotePickup.lmiitSwitch);
+        this.limitSwitch = new DigitalInput(Constants.NotePickup.limitSwitch);
     }
 
     public void setPivotPosition(PivotPosition pivotPosition) {

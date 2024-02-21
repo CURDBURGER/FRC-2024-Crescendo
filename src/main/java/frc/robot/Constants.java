@@ -7,9 +7,10 @@ public final class Constants {
         public static final int backLeftMotorChannel = 12;
         public static final int frontRightMotorChannel = 13;
         public static final int backRightMotorChannel = 14;
-        public static final double autoShooterSpeed = .5;
-        public static final int outtakeTime = 1000;
-        public static final int revTime = 700;
+        public static final double autoShooterSpeed = 1;
+        public static final int outtakeTime = 1500;
+        public static final int revTime = 1000;
+        public static final double backWheelPercent = .5;
     }
 
     public static class Climber {
@@ -28,23 +29,23 @@ public final class Constants {
     // TODO
     public static final class NotePickup {
         public final static int inputMotorChannel =1; //is a motor not a solenoid
-        public final static double inputMotorSpeed = -.7; //make negative to reverse rotor
+        public final static double inputMotorSpeed = -1; //make negative to reverse rotor
         public final static int pivotMotor = 0;
         public final static int pivotEncoder1 = 1;
         public final static int pivotEncoder2 = 2;
         public final static int outEncoderPosition = -600;
         public final static int inEncoderPosition = 0;
-        public static double pivotSpeed = .25;
-        public static int lmiitSwitch = 4;
+        public static double pivotSpeed = .4;
+        public static int limitSwitch = 4;
         public static int pivotEncoder3 = 3;
     }
 
     public static final class Auto {
         public final static double robotLength = .9144;
-        public final static double intakePretrusionLength = .2032;
+        public final static double intakeProtrusionLength = .2032;
         public final static double noteDiameter = .36;
         public final static double noteRadius = noteDiameter/2;
-        public final static double xDistanceToNote = 1.98 - robotLength - intakePretrusionLength - noteRadius;
+        public final static double xDistanceToNote = 1.98 - robotLength - intakeProtrusionLength - noteRadius;
         public final static double yDistanceToNote = 1.45;
         public final static double directionToNote = Math.atan(yDistanceToNote/xDistanceToNote);
         public static double diagonalDistanceToNote  = Math.hypot(xDistanceToNote, yDistanceToNote);
@@ -60,6 +61,6 @@ public final class Constants {
         public static double alignSpeed = 2.6;
     }
 
-
-    public static final double DEAD_ZONE = 0.02;
+    public static final double linearDeadband = 0.1;
+    public static final double rotationalDeadband = 0.2;
 }
