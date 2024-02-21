@@ -112,7 +112,7 @@ public class RobotContainer {
 
         // Manual shoot
         joystick.button(2).onTrue(getManualShoot());
-        joystick.button(2).whileTrue(new ManualShooterCommand(shooterSubsystem, joystick));
+        joystick.button(2).onTrue(getManualShoot());
         controller.x().onTrue(getManualShoot());
 
         //Intake
@@ -165,17 +165,16 @@ public class RobotContainer {
     }
 
     private Command getManualShoot() {
-        return new SequentialCommandGroup(
+        return new ParallelRaceGroup(
                 // spin up
-                new ParallelRaceGroup(
-//                        new ManualShooterCommand(shooterSubsystem, joystick),
-                        new TimerCommand(Constants.Shooter.revTime)
+                new ManualShootCommand(shooterSubsystem, joystick),
+                new SequentialCommamdGroup(
+                        new TimerCommand(Constants.Shooter.revTime),
+                        new ParallelRaceGroup(
+                            new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                            new TimerCommand(Constants.Shooter.outtakeTime)
+                         )
                 ),
-                new ParallelRaceGroup(
-//                        new ManualShooterCommand(shooterSubsystem, joystick),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
-                )
         );
     }
     private Command getManualIntake() {
