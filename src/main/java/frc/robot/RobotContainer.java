@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,6 +25,7 @@ import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
 import frc.robot.commands.autoCommands.LeaveCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
+import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -47,7 +49,7 @@ public class RobotContainer {
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    //private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
+    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
@@ -87,9 +89,9 @@ public class RobotContainer {
     }
 
     public void robotEnabled() {
-//        getManualShoot();
         new PivotCommand(pivotSubsystem, false);
         drive.setPose(new Pose2d(new Translation2d(0, 0),new Rotation2d(0)));
+        CameraServer.startAutomaticCapture();
     }
 
     /**
@@ -130,6 +132,7 @@ public class RobotContainer {
         controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
+        joystick.button(10).onTrue(new ToggleFieldOrientedCommand(drive));
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -153,16 +156,15 @@ public class RobotContainer {
      */
 
     private Command getAutoShoot() {
-        return new SequentialCommandGroup(
+        return new ParallelRaceGroup(
                 // spin up
-                new ParallelRaceGroup(
-                        //new AutomaticAlignCommand(aprilTagSubsystem),
-                        //new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed)
-                ),
-                new ParallelRaceGroup(
-                        //new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                new ManualShooterCommand(shooterSubsystem, joystick),
+                new SequentialCommandGroup(
+                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
+                        new ParallelRaceGroup(
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
                 )
         );
     }
@@ -174,23 +176,22 @@ public class RobotContainer {
                 new SequentialCommandGroup(
                         new TimerCommand(Constants.Shooter.revTime),
                         new ParallelRaceGroup(
-                            new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                            new TimerCommand(Constants.Shooter.outtakeTime)
-                         )
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
                 )
         );
     }
     private Command getManualIntake() {
-        return new SequentialCommandGroup(
+        return new ParallelRaceGroup(
                 // spin up
-                new ParallelRaceGroup(
-                        new ManualIntakeCommand(shooterSubsystem, joystick),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new ManualIntakeCommand(shooterSubsystem, joystick),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                new ManualIntakeCommand(shooterSubsystem, joystick),
+                new SequentialCommandGroup(
+                        new TimerCommand(Constants.Shooter.revTime),
+                        new ParallelRaceGroup(
+                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
+                                new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
                 )
         );
     }

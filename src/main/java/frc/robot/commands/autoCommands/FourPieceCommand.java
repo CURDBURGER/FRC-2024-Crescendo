@@ -18,13 +18,15 @@ public class FourPieceCommand {
     public static Command create(Drive drive, IntakeSubsystem intakeSubsystem, PivotSubsystem pivotSubsystem, ShooterSubsystem shooterSubsystem) {
         return new SequentialCommandGroup(
                 new ParallelRaceGroup(
+                        // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                        new SequentialCommandGroup(
+                                new TimerCommand(Constants.Shooter.revTime),
+                                new ParallelRaceGroup(
+                                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                        new TimerCommand(Constants.Shooter.outtakeTime)
+                                )
+                        )
                 ),
                 new ParallelCommandGroup(
                         new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote, 0)
@@ -39,13 +41,15 @@ public class FourPieceCommand {
 //                        new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
+                        // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                        new SequentialCommandGroup(
+                                new TimerCommand(Constants.Shooter.revTime),
+                                new ParallelRaceGroup(
+                                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                        new TimerCommand(Constants.Shooter.outtakeTime)
+                                )
+                        )
                 ),
                 new ParallelCommandGroup(
                         new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.diagonalDistanceToNote, Constants.Auto.directionToNote)
@@ -61,13 +65,15 @@ public class FourPieceCommand {
 //                        new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
+                        // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                        new SequentialCommandGroup(
+                                new TimerCommand(Constants.Shooter.revTime),
+                                new ParallelRaceGroup(
+                                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                        new TimerCommand(Constants.Shooter.outtakeTime)
+                                )
+                        )
                 ),
                 new ParallelCommandGroup(
                         new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.diagonalDistanceToNote, -Constants.Auto.directionToNote)
@@ -83,13 +89,15 @@ public class FourPieceCommand {
 //                        new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
+                        // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                        new SequentialCommandGroup(
+                                new TimerCommand(Constants.Shooter.revTime),
+                                new ParallelRaceGroup(
+                                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                        new TimerCommand(Constants.Shooter.outtakeTime)
+                                )
+                        )
                 )
         );
     }

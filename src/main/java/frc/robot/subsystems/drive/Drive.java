@@ -24,7 +24,7 @@ import static frc.robot.Constants.WheelModule.*;
 
 public class Drive extends SubsystemBase {
 
-    public static final boolean FIELD_ORIENTED = false;
+    public static boolean FIELD_ORIENTED = true;
     private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
@@ -97,16 +97,16 @@ public class Drive extends SubsystemBase {
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
         gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
-        if (FIELD_ORIENTED && gyroInputs.connected) {
-            // If the gyro is connected, replace the theta component of the twist
-            // with the change in angle since the last loop cycle.
-            twist = new Twist2d(
-                    twist.dx,
-                    twist.dy,
-                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
-            );
-            lastGyroRotation = gyroInputs.yawPosition;
-        }
+//        if (FIELD_ORIENTED && gyroInputs.connected) {
+//            // If the gyro is connected, replace the theta component of the twist
+//            // with the change in angle since the last loop cycle.
+//            twist = new Twist2d(
+//                    twist.dx,
+//                    twist.dy,
+//                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+//            );
+//            lastGyroRotation = gyroInputs.yawPosition;
+//        }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
         poseXDebug.setDouble(pose.getX());
@@ -143,6 +143,10 @@ public class Drive extends SubsystemBase {
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
 
+    }
+
+    public void toggleFieldOriented(){
+        FIELD_ORIENTED = !FIELD_ORIENTED;
     }
 
     /**
@@ -218,7 +222,11 @@ public class Drive extends SubsystemBase {
      * Returns the current odometry rotation.
      */
     public Rotation2d getRotation() {
-        return pose.getRotation();
+        if(FIELD_ORIENTED){
+            return pose.getRotation();
+        } else {
+            return new Rotation2d(0);
+        }
     }
 
     /**
