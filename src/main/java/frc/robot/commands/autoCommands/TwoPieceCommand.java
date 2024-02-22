@@ -25,16 +25,16 @@ public class TwoPieceCommand extends Command{
                         new TimerCommand(Constants.Shooter.outtakeTime)
                 ),
                 new ParallelCommandGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote, 0),
-                        new PivotCommand(pivotSubsystem, true)
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote, 0)
+//                        new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
                         new DriveToPoseCommand(drive, Constants.Auto.slowSpeed, Constants.Auto.noteRadius, 0),
                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelCommandGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + Constants.Auto.noteRadius, 180),
-                        new PivotCommand(pivotSubsystem, false)
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + Constants.Auto.noteRadius, 180)
+//                        new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),

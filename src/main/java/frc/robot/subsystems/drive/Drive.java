@@ -111,7 +111,7 @@ public class Drive extends SubsystemBase {
         pose = pose.exp(twist);
         poseXDebug.setDouble(pose.getX());
         poseYDebug.setDouble(pose.getY());
-        poseRotDebug.setDouble(pose.getRotation().toDegrees());
+        poseRotDebug.setDouble(pose.getRotation().getDegrees());
 //
 
     }
@@ -218,7 +218,7 @@ public class Drive extends SubsystemBase {
      * Returns the current odometry rotation.
      */
     public Rotation2d getRotation() {
-        return gyroInputs.yawPosition;
+        return pose.getRotation();
     }
 
     /**

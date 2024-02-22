@@ -27,9 +27,9 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         var speed = this.speed;
-        frontLeftMotor.set(-speed);
-        backLeftMotor.set(-speed);
-        frontRightMotor.set(speed);
-        backRightMotor.set(speed);
+        frontLeftMotor.set(speed);
+        backLeftMotor.set(speed);
+        frontRightMotor.set(-speed);
+        backRightMotor.set(-speed);
     }
 }

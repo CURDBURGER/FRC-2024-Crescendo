@@ -34,7 +34,7 @@ public class DriveToPoseCommand extends Command {
     public void execute() {
         Rotation2d rotation = drive.getRotation();
         double xSpeed = speed*Math.cos(direction);
-        double ySpeed = -speed*Math.sin(direction);
+        double ySpeed = speed*Math.sin(direction);
         drive.runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, 0, rotation)
         );

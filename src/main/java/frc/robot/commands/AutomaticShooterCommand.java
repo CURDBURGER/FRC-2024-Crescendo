@@ -17,7 +17,7 @@
      }
 
      @Override
-     public void execute() {shooterSubsystem.setShooterSpeed(speed);}
+     public void execute() {shooterSubsystem.setShooterSpeed(-speed);}
 
      @Override
      public void end(boolean interrupted) {shooterSubsystem.setShooterSpeed(0.0);}

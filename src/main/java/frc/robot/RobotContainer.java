@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -86,7 +89,7 @@ public class RobotContainer {
     public void robotEnabled() {
 //        getManualShoot();
         new PivotCommand(pivotSubsystem, false);
-
+        drive.setPose(new Pose2d(new Translation2d(0, 0),new Rotation2d(0)));
     }
 
     /**
@@ -167,14 +170,14 @@ public class RobotContainer {
     private Command getManualShoot() {
         return new ParallelRaceGroup(
                 // spin up
-                new ManualShootCommand(shooterSubsystem, joystick),
-                new SequentialCommamdGroup(
+                new ManualShooterCommand(shooterSubsystem, joystick),
+                new SequentialCommandGroup(
                         new TimerCommand(Constants.Shooter.revTime),
                         new ParallelRaceGroup(
                             new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                             new TimerCommand(Constants.Shooter.outtakeTime)
                          )
-                ),
+                )
         );
     }
     private Command getManualIntake() {

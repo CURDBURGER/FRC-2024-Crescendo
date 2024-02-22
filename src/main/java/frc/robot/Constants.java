@@ -7,7 +7,7 @@ public final class Constants {
         public static final int backLeftMotorChannel = 12;
         public static final int frontRightMotorChannel = 13;
         public static final int backRightMotorChannel = 14;
-        public static final double autoShooterSpeed = 1;
+        public static final double autoShooterSpeed = -1;
         public static final int outtakeTime = 1500;
         public static final int revTime = 1000;
         public static final double backWheelPercent = .5;
@@ -49,8 +49,8 @@ public final class Constants {
         public final static double yDistanceToNote = 1.45;
         public final static double directionToNote = Math.atan(yDistanceToNote/xDistanceToNote);
         public static double diagonalDistanceToNote  = Math.hypot(xDistanceToNote, yDistanceToNote);
-        public static double normalSpeed = 1.5;
-        public static double slowSpeed = .9;
+        public static double normalSpeed = .5;
+        public static double slowSpeed = .3;
     }
 
     public static final class Align {
