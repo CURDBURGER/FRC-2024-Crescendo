@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,10 +13,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -25,7 +25,6 @@ import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
 import frc.robot.commands.autoCommands.LeaveCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
-import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -33,8 +32,6 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
-
-import java.util.concurrent.ConcurrentMap;
 
 import static frc.robot.Constants.WheelModule.*;
 
@@ -49,7 +46,7 @@ public class RobotContainer {
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
+    //    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
@@ -60,6 +57,7 @@ public class RobotContainer {
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
 
+    private boolean isFieldOriented = true;
 
     // Dashboard inputs
 
@@ -90,8 +88,7 @@ public class RobotContainer {
 
     public void robotEnabled() {
         new PivotCommand(pivotSubsystem, false);
-        drive.setPose(new Pose2d(new Translation2d(0, 0),new Rotation2d(0)));
-        CameraServer.startAutomaticCapture();
+        drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
     }
 
     /**
@@ -132,7 +129,7 @@ public class RobotContainer {
         controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
-        joystick.button(10).onTrue(new ToggleFieldOrientedCommand(drive));
+        joystick.button(10).onTrue(setFieldOriented());
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -144,7 +141,8 @@ public class RobotContainer {
                         },
                         () -> { // z+ is rotating counterclockwise
                             return -joystick.getTwist();
-                        }
+                        },
+                        isFieldOriented
                 )
         );
     }
@@ -160,7 +158,7 @@ public class RobotContainer {
                 // spin up
                 new ManualShooterCommand(shooterSubsystem, joystick),
                 new SequentialCommandGroup(
-                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
+//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
@@ -182,6 +180,7 @@ public class RobotContainer {
                 )
         );
     }
+
     private Command getManualIntake() {
         return new ParallelRaceGroup(
                 // spin up
@@ -194,6 +193,11 @@ public class RobotContainer {
                         )
                 )
         );
+    }
+
+    public Command setFieldOriented() {
+        this.isFieldOriented = !this.isFieldOriented;
+        return new ParallelRaceGroup();
     }
 
     public Command getAutonomousCommand() {

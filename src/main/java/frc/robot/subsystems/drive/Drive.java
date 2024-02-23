@@ -24,7 +24,6 @@ import static frc.robot.Constants.WheelModule.*;
 
 public class Drive extends SubsystemBase {
 
-    public static boolean FIELD_ORIENTED = true;
     private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
@@ -145,10 +144,6 @@ public class Drive extends SubsystemBase {
 
     }
 
-    public void toggleFieldOriented(){
-        FIELD_ORIENTED = !FIELD_ORIENTED;
-    }
-
     /**
      * Stops the drive.
      */
@@ -222,11 +217,7 @@ public class Drive extends SubsystemBase {
      * Returns the current odometry rotation.
      */
     public Rotation2d getRotation() {
-        if(FIELD_ORIENTED){
-            return pose.getRotation();
-        } else {
-            return new Rotation2d(0);
-        }
+        return pose.getRotation();
     }
 
     /**

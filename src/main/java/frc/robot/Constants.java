@@ -47,7 +47,7 @@ public final class Constants {
         public final static double noteRadius = noteDiameter/2;
         public final static double xDistanceToNote = 1.98 - robotLength - intakeProtrusionLength - noteRadius;
         public final static double yDistanceToNote = 1.45;
-        public final static double directionToNote = Math.atan(yDistanceToNote/xDistanceToNote);
+        public final static double directionToNote = Math.atan(yDistanceToNote/xDistanceToNote) * (180/Math.PI);
         public static double diagonalDistanceToNote  = Math.hypot(xDistanceToNote, yDistanceToNote);
         public static double normalSpeed = .5;
         public static double slowSpeed = .3;

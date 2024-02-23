@@ -15,7 +15,6 @@ public class DriveToPoseCommand extends Command {
     private final double distance;
     private final double direction;
     private Pose2d initialPose;
-    private final GenericEntry ySpeedDebug;
 
     //speed in meters/second
     //distance in meters
@@ -26,7 +25,6 @@ public class DriveToPoseCommand extends Command {
         this.distance = distance;
         this.direction = Math.toRadians(direction);
         addRequirements(drive);
-        ySpeedDebug =  Shuffleboard.getTab("General").add("Y Speed", 0).getEntry();
     }
 
     @Override
@@ -39,7 +37,6 @@ public class DriveToPoseCommand extends Command {
         Rotation2d rotation = drive.getRotation();
         double xSpeed = speed*Math.cos(direction);
         double ySpeed = -speed*Math.sin(direction);
-        ySpeedDebug.setDouble(ySpeed);
         drive.runVelocity(
                 ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, 0, rotation)
         );
