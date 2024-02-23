@@ -50,14 +50,14 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
+    //random vars
+    private boolean isFieldOriented = true;
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
-
+    private GenericEntry debugFieldOriented = Shuffleboard.getTab("General").add("Is Field Oriented", isFieldOriented).getEntry();
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
-
-    private boolean isFieldOriented = true;
 
     // Dashboard inputs
 
@@ -129,7 +129,7 @@ public class RobotContainer {
         controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
-        joystick.button(10).onTrue(setFieldOriented());
+        joystick.button(10).onTrue(toggleFieldOriented());
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -195,8 +195,9 @@ public class RobotContainer {
         );
     }
 
-    public Command setFieldOriented() {
-        this.isFieldOriented = !this.isFieldOriented;
+    public Command toggleFieldOriented() {
+        isFieldOriented = !isFieldOriented;
+        debugFieldOriented.setBoolean(isFieldOriented);
         return new ParallelRaceGroup();
     }
 
