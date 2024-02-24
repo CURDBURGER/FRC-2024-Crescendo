@@ -51,7 +51,7 @@ public class RobotContainer {
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
     //random vars
-    private boolean isFieldOriented = true;
+    private boolean isFieldOriented = false;
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
     private GenericEntry debugFieldOriented = Shuffleboard.getTab("General").add("Is Field Oriented", isFieldOriented).getEntry();
 
@@ -89,6 +89,7 @@ public class RobotContainer {
     public void robotEnabled() {
         new PivotCommand(pivotSubsystem, false);
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        drive.straightenWheels();
     }
 
     /**

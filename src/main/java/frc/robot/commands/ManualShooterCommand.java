@@ -21,7 +21,7 @@ public class ManualShooterCommand extends Command {
     @Override
     public void execute() {
         var speed = (-joystick.getThrottle() + 1) / 2;
-        shooterSubsystem.setShooterSpeed(-speed);
+        shooterSubsystem.setShooterSpeed(speed);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class PivotSubsystem extends SubsystemBase {
         if (limitSwitch.get() == false) {
             pivotEncoder.reset();
         }
-        limitSwitchOn.setBoolean(limitSwitch.get());
+        limitSwitchOn.setBoolean(!limitSwitch.get());
 
         var position = pivotEncoder.get();
         if (pivotPosition == PivotPosition.out && position > Constants.NotePickup.outEncoderPosition) {
