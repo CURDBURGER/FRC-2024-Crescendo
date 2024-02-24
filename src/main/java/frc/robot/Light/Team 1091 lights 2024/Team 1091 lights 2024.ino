@@ -32,11 +32,10 @@ void setup() {
   
 }
 //start positions of each light
-int currentLedBlue = 0;
-int currentLedRed = 20;
-int currentLedOrange = 40;
-int currentLedAlliance = 0;
-int currentLedClear = 60;
+int currentLed = 0;
+int currentLedClear = 30;
+int currentLedAlliance = 60;
+int c
 unsigned long lastChange = 0;
 
 void loop() {
@@ -47,26 +46,23 @@ void loop() {
   delay(33);
   //changes position of lights by 1 every second
   if (lastChange < millis() + 1000) {
-    currentLedBlue++;
-    currentLedRed++;
-    currentLedOrange++;
-    currentLedAlliance++;
+    currentLed++;
     currentLedClear++;
+    currentLedAlliance++;
     lastChange = millis();
 
   //resets lights to 0 if past a certain value
-  if (currentLedBlue >= NUM_LEDS) currentLedBlue = 0;
-  if (currentLedRed >= NUM_LEDS) currentLedRed = 0;
-  if (currentLedOrange >= NUM_LEDS) currentLedOrange = 0;
+  if (currentLed >= NUM_LEDS) currentLed = 0;
+  if (currentLedClear >= NUM_LEDS) currentLedClear = 0;
   if (currentLedAlliance >= NUM_LEDS * 2) currentLedAlliance = 0;
-  if (currentLedClear >= NUM_LEDS * 2) currentLedClear = 0;
 
   if (yellowButtonState == HIGH) {
   // read the state of the pushbutton value:
     // diplays the orange red and blue leds no matter what the blackButtonState variable is
-    strip.setPixelColor(currentLedBlue, 0, 0, 255);
-    strip.setPixelColor(currentLedRed, 225, 0, 0);
-    strip.setPixelColor(currentLedOrange, 225, 25, 0);
+    strip.setPixelColor(29-currentLed, 225, 25, 0);
+    strip.setPixelColor(30+currentLed, 225, 25, 0);
+    strip.setPixelColor(29-currentLedClear, 0, 0, 0);
+    strip.setPixelColor(30+currentLedClear, 0, 0, 0);
     strip.show();
   
 
@@ -76,12 +72,12 @@ void loop() {
     if (blackButtonState == HIGH) {
       // display the alliance led as blue and the clear led
       strip.setPixelColor(currentLedAlliance, 0, 0, 255);
-      strip.setPixelColor(currentLedClear, 0, 0, 0);
+      strip.setPixelColor(currentLedClearAlliance, 0, 0, 0);
       strip.show();
     } else {
         // display the alliance led as red and the clear led
       strip.setPixelColor(currentLedAlliance, 225, 0, 0);
-      strip.setPixelColor(currentLedClear, 0, 0, 0);
+      strip.setPixelColor(currentLedClearAlliance, 0, 0, 0);
       strip.show();
     }
   }

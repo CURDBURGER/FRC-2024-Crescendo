@@ -130,7 +130,9 @@ public class RobotContainer {
         controller.leftStick().whileTrue(getManualIntake());
 
         // Drive
+        System.out.println("Out of Method Before: " + isFieldOriented);
         joystick.button(10).onTrue(toggleFieldOriented());
+        System.out.println("Out of Method After: " + isFieldOriented);
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -197,7 +199,9 @@ public class RobotContainer {
     }
 
     public Command toggleFieldOriented() {
-        isFieldOriented = !isFieldOriented;
+        System.out.println("In Method Before: " + isFieldOriented);
+        this.isFieldOriented = !isFieldOriented;
+        System.out.println("In Method After: " + isFieldOriented);
         debugFieldOriented.setBoolean(isFieldOriented);
         return new ParallelRaceGroup();
     }
