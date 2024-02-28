@@ -3,6 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -49,7 +51,7 @@ public class DriveToPoseCommand extends Command {
     public boolean isFinished() {
         double distanceToX = drive.getPose().getX()-initialPose.getX();
         double distanceToY = drive.getPose().getY()-initialPose.getY();
-        double distanceToPose = Math.sqrt(distanceToX * distanceToX + distanceToY * distanceToY);
+        double distanceToPose = Math.hypot(distanceToX, distanceToY);
         return distanceToPose >= distance;
     }
 }

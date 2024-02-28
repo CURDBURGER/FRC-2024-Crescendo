@@ -9,9 +9,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static frc.robot.Constants.WheelModule.*;
@@ -22,7 +24,6 @@ import static frc.robot.Constants.WheelModule.*;
 
 public class Drive extends SubsystemBase {
 
-    public static final boolean FIELD_ORIENTED = false;
     private static final double MAX_LINEAR_SPEED = Units.feetToMeters(9.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
@@ -32,6 +33,10 @@ public class Drive extends SubsystemBase {
 
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
+    private GenericEntry gyroYawDebug;
+    private GenericEntry poseXDebug;
+    private GenericEntry poseYDebug;
+    private GenericEntry poseRotDebug;
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
 
@@ -56,6 +61,10 @@ public class Drive extends SubsystemBase {
                 .getDefault()
                 .getStructArrayTopic("MyStates", SwerveModuleState.struct)
                 .publish();
+        gyroYawDebug = Shuffleboard.getTab("General").add("Gyro Yaw", 0).getEntry();
+        poseXDebug = Shuffleboard.getTab("General").add("Pose X", 0).getEntry();
+        poseYDebug = Shuffleboard.getTab("General").add("Pose Y", 0).getEntry();
+        poseRotDebug = Shuffleboard.getTab("General").add("Pose Rotation", 0).getEntry();
     }
 
     public void periodic() {
@@ -86,8 +95,8 @@ public class Drive extends SubsystemBase {
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
-        //Shuffleboard.getTab("General").add("Gyro Yaw", gyroInputs.yawPosition);
-        if (FIELD_ORIENTED && gyroInputs.connected) {
+        gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
+        if (gyroInputs.connected) {
             // If the gyro is connected, replace the theta component of the twist
             // with the change in angle since the last loop cycle.
             twist = new Twist2d(
@@ -99,6 +108,9 @@ public class Drive extends SubsystemBase {
         }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
+        poseXDebug.setDouble(pose.getX());
+        poseYDebug.setDouble(pose.getY());
+        poseRotDebug.setDouble(pose.getRotation().getDegrees());
 //
 
     }
@@ -205,7 +217,7 @@ public class Drive extends SubsystemBase {
      * Returns the current odometry rotation.
      */
     public Rotation2d getRotation() {
-        return gyroInputs.yawPosition;
+        return pose.getRotation();
     }
 
     /**

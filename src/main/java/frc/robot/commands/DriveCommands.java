@@ -12,13 +12,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.Constants;
 
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
-    private static final double DEADBAND = 0.1;
-
-
     private static ShuffleboardTab tab = Shuffleboard.getTab("General");
     //    private static GenericEntry xLog, yLog, zLog;
     private static GenericEntry xLog = tab.add("x forward", 0.0).getEntry();
@@ -35,15 +33,16 @@ public class DriveCommands {
             Drive drive,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
-            DoubleSupplier omegaSupplier) {
+            DoubleSupplier omegaSupplier,
+            boolean isFieldOriented) {
         return Commands.run(
                 () -> {
                     // Apply deadband
                     double linearMagnitude = MathUtil.applyDeadband(
-                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
+                            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), Constants.linearDeadband);
                     Rotation2d linearDirection =
                             new Rotation2d(-xSupplier.getAsDouble(), ySupplier.getAsDouble());
-                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+                    double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), Constants.rotationalDeadband);
 
                     // Square values
                     linearMagnitude = linearMagnitude * linearMagnitude;
@@ -61,14 +60,25 @@ public class DriveCommands {
                                     .getTranslation();
 
                     // Convert to field relative speeds & send command
-                    drive.runVelocity(
-                            ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    omega * drive.getMaxAngularSpeedRadPerSec(),
-                                    drive.getRotation()
-                            )
-                    );
+                    if(isFieldOriented){
+                        drive.runVelocity(
+                                ChassisSpeeds.fromFieldRelativeSpeeds(
+                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        omega * drive.getMaxAngularSpeedRadPerSec(),
+                                        drive.getRotation()
+                                )
+                        );
+                    } else {
+                        drive.runVelocity(
+                                ChassisSpeeds.fromFieldRelativeSpeeds(
+                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        omega * drive.getMaxAngularSpeedRadPerSec(),
+                                        new Rotation2d(0)
+                                )
+                        );
+                    }
                 },
                 drive);
     }
