@@ -4,19 +4,22 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.ColorSensorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
@@ -30,8 +33,6 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
 
-import java.util.concurrent.ConcurrentMap;
-
 import static frc.robot.Constants.WheelModule.*;
 
 /**
@@ -41,22 +42,22 @@ import static frc.robot.Constants.WheelModule.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
     // Subsystems
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    private final ColorSensorSubsystem colorSensorSubsystem;
-    //private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
+    //    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
+    //random vars
+    private boolean isFieldOriented = false;
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+    private GenericEntry debugFieldOriented = Shuffleboard.getTab("General").add("Is Field Oriented", isFieldOriented).getEntry();
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
-
 
     // Dashboard inputs
 
@@ -74,9 +75,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(BACK_LEFT),
                 new ModuleIOTalonFX(BACK_RIGHT)
         );
-      
-        colorSensorSubsystem = new ColorSensorSubsystem();
-
         // Configure the button bindings
         configureButtonBindings();
 
@@ -89,9 +87,9 @@ public class RobotContainer {
     }
 
     public void robotEnabled() {
-//        getManualShoot();
         new PivotCommand(pivotSubsystem, false);
-
+        drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        drive.straightenWheels();
     }
 
     /**
@@ -117,7 +115,7 @@ public class RobotContainer {
 
         // Manual shoot
         joystick.button(2).onTrue(getManualShoot());
-        joystick.button(2).whileTrue(new ManualShooterCommand(shooterSubsystem, joystick));
+        joystick.button(2).onTrue(getManualShoot());
         controller.x().onTrue(getManualShoot());
 
         //Intake
@@ -128,10 +126,13 @@ public class RobotContainer {
         controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
         controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
 
-        joystick.button(8).whileTrue(getManualIntake());
-        controller.leftStick().whileTrue(getManualIntake());
+        //Spit
+        joystick.button(9).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         // Drive
+        System.out.println("Out of Method Before: " + isFieldOriented);
+        joystick.button(10).onTrue(toggleFieldOriented());
+        System.out.println("Out of Method After: " + isFieldOriented);
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -143,7 +144,8 @@ public class RobotContainer {
                         },
                         () -> { // z+ is rotating counterclockwise
                             return -joystick.getTwist();
-                        }
+                        },
+                        isFieldOriented
                 )
         );
     }
@@ -155,47 +157,39 @@ public class RobotContainer {
      */
 
     private Command getAutoShoot() {
-        return new SequentialCommandGroup(
+        return new ParallelRaceGroup(
                 // spin up
-                new ParallelRaceGroup(
-                        //new AutomaticAlignCommand(aprilTagSubsystem),
-                        //new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed)
-                ),
-                new ParallelRaceGroup(
-                        //new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                new ManualShooterCommand(shooterSubsystem, joystick),
+                new SequentialCommandGroup(
+//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
+                        new ParallelRaceGroup(
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
                 )
         );
     }
 
     private Command getManualShoot() {
-        return new SequentialCommandGroup(
+        return new ParallelRaceGroup(
                 // spin up
-                new ParallelRaceGroup(
-//                        new ManualShooterCommand(shooterSubsystem, joystick),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-//                        new ManualShooterCommand(shooterSubsystem, joystick),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
+                new ManualShooterCommand(shooterSubsystem, joystick),
+                new SequentialCommandGroup(
+                        new TimerCommand(Constants.Shooter.revTime),
+                        new ParallelRaceGroup(
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+                                new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
                 )
         );
     }
-    private Command getManualIntake() {
-        return new SequentialCommandGroup(
-                // spin up
-                new ParallelRaceGroup(
-                        new ManualIntakeCommand(shooterSubsystem, joystick),
-                        new TimerCommand(Constants.Shooter.revTime)
-                ),
-                new ParallelRaceGroup(
-                        new ManualIntakeCommand(shooterSubsystem, joystick),
-                        new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                        new TimerCommand(Constants.Shooter.outtakeTime)
-                )
-        );
+
+    public Command toggleFieldOriented() {
+        System.out.println("In Method Before: " + isFieldOriented);
+        this.isFieldOriented = !isFieldOriented;
+        System.out.println("In Method After: " + isFieldOriented);
+        debugFieldOriented.setBoolean(isFieldOriented);
+        return new ParallelRaceGroup();
     }
 
     public Command getAutonomousCommand() {
@@ -219,3 +213,5 @@ public class RobotContainer {
         return new ParallelCommandGroup(/*new LightCommand(lightsSubsystem),*/ command);
     }
 }
+
+
