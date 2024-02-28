@@ -38,6 +38,7 @@ public final class Constants {
         public static double pivotSpeed = -.8;
         public static int limitSwitch = 4;
         public static int pivotEncoder3 = 3;
+        public static double spitSpeed = .3;
     }
 
     public static final class Auto {

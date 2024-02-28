@@ -126,8 +126,8 @@ public class RobotContainer {
         controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
         controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
 
-        joystick.button(8).whileTrue(getManualIntake());
-        controller.leftStick().whileTrue(getManualIntake());
+        //Spit
+        joystick.button(9).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         // Drive
         System.out.println("Out of Method Before: " + isFieldOriented);
@@ -178,20 +178,6 @@ public class RobotContainer {
                         new TimerCommand(Constants.Shooter.revTime),
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                                new TimerCommand(Constants.Shooter.outtakeTime)
-                        )
-                )
-        );
-    }
-
-    private Command getManualIntake() {
-        return new ParallelRaceGroup(
-                // spin up
-                new ManualIntakeCommand(shooterSubsystem, joystick),
-                new SequentialCommandGroup(
-                        new TimerCommand(Constants.Shooter.revTime),
-                        new ParallelRaceGroup(
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
                         )
                 )
