@@ -17,10 +17,10 @@
  public class AutomaticAlignCommand extends Command {
      private AprilTagSubsystem aprilTagSubsystem;
      private Drive drive;
-     private final GenericEntry canSeeSpeakerTag;
-     private final GenericEntry depthToTag;
-     private final GenericEntry horizontalDistanceToTag;
-     private final GenericEntry yawToTag;
+//     private final GenericEntry canSeeSpeakerTag;
+//     private final GenericEntry depthToTag;
+//     private final GenericEntry horizontalDistanceToTag;
+//     private final GenericEntry yawToTag;
      private final ShuffleboardTab tab = Shuffleboard.getTab("General");
      private int speakerID;
      private boolean doneStrafing = false;
@@ -29,10 +29,10 @@
      public AutomaticAlignCommand(AprilTagSubsystem aprilTagSubsystem, Drive drive) {
          this.aprilTagSubsystem = aprilTagSubsystem;
          this.drive = drive;
-         canSeeSpeakerTag = tab.add("Can See Speaker Tag", false).getEntry();
-         depthToTag = tab.add("Depth To Tag", 0).getEntry();
-         horizontalDistanceToTag = tab.add("Horizontal Distance To Tag", 0).getEntry();
-         yawToTag = tab.add("Yaw To Tag", 0).getEntry();
+//         canSeeSpeakerTag = tab.add("Can See Speaker Tag", false).getEntry();
+//         depthToTag = tab.add("Depth To Tag", 0).getEntry();
+//         horizontalDistanceToTag = tab.add("Horizontal Distance To Tag", 0).getEntry();
+//         yawToTag = tab.add("Yaw To Tag", 0).getEntry();
      }
      //depth to tag  camera is at 0  max possible is 5.75 meters
      //horizontal  0 at center of camera
@@ -54,12 +54,12 @@
          List<PhotonTrackedTarget> targets = aprilTagSubsystem.getTargets();
 
          if(targets.contains(speakerID)){
-             canSeeSpeakerTag.setBoolean(true);
+//             canSeeSpeakerTag.setBoolean(true);
              Transform3d speakerTag = targets.get(targets.indexOf(speakerID)).getBestCameraToTarget();
 
-             depthToTag.setDouble(speakerTag.getX());
-             horizontalDistanceToTag.setDouble(speakerTag.getY());
-             yawToTag.setDouble(speakerTag.getRotation().getAngle());
+//             depthToTag.setDouble(speakerTag.getX());
+//             horizontalDistanceToTag.setDouble(speakerTag.getY());
+//             yawToTag.setDouble(speakerTag.getRotation().getAngle());
 
              if (Math.abs(speakerTag.getY()) > Constants.Align.errorMargin) {
                  if (speakerTag.getY() > 0) {
@@ -81,7 +81,7 @@
              drive.runVelocity(new ChassisSpeeds(xVelocity, yVelocity, 0));
 
          } else{
-             canSeeSpeakerTag.setBoolean(false);
+//             canSeeSpeakerTag.setDoubleBoolean(false);
          }
      }
 

@@ -35,7 +35,7 @@ public final class Constants {
         public final static int pivotEncoder2 = 2;
         public final static int outEncoderPosition = -950;
         public final static int inEncoderPosition = 0;
-        public static double pivotSpeed = -.8;
+        public static double pivotSpeed = -.5;
         public static int limitSwitch = 4;
         public static int pivotEncoder3 = 3;
         public static double spitSpeed = .3;

@@ -32,6 +32,7 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
+import frc.robot.subsystems.AprilTagSubsystem;
 
 import static frc.robot.Constants.WheelModule.*;
 
@@ -46,7 +47,7 @@ public class RobotContainer {
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    //    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
+    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
 
@@ -161,7 +162,7 @@ public class RobotContainer {
                 // spin up
                 new ManualShooterCommand(shooterSubsystem, joystick),
                 new SequentialCommandGroup(
-//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
+                       new AutomaticAlignCommand(aprilTagSubsystem, drive),
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
