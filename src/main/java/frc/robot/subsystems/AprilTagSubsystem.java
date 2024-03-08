@@ -18,7 +18,7 @@
      List<PhotonTrackedTarget> targets = null;
 
      public AprilTagSubsystem() {
-         camera = new PhotonCamera("Microsoft_LifeCam_HD");
+         camera = new PhotonCamera("Photon_Camera");
      }
 
      @Override

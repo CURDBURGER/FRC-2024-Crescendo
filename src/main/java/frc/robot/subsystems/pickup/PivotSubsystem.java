@@ -12,7 +12,7 @@ import frc.robot.Constants;
 
 public class PivotSubsystem extends SubsystemBase {
     public enum PivotPosition {
-        in, out;
+        in, out, amp;
     }
 
     private final PWMVictorSPX pivotMotor;
@@ -49,16 +49,11 @@ public class PivotSubsystem extends SubsystemBase {
             pivotMotor.set(Constants.NotePickup.pivotSpeed);
         } else if (pivotPosition == pivotPosition.in && position < Constants.NotePickup.inEncoderPosition  && limitSwitch.get() == true) {
             pivotMotor.set(-Constants.NotePickup.pivotSpeed);
+        } else if (pivotPosition == pivotPosition.amp && position > Constants.NotePickup.ampPosition){
+            pivotMotor.set(Constants.NotePickup.pivotSpeed);
         } else {
             pivotMotor.set(0);
         }
-//        if (pivotPosition == PivotPosition.out) {
-//            pivotMotor.set(Constants.NotePickup.pivotSpeed);
-//        } else if (pivotPosition == pivotPosition.in && limitSwitch.get() == true) {
-//            pivotMotor.set(-Constants.NotePickup.pivotSpeed);
-//        } else {
-//            pivotMotor.set(0);
-//        }
     }
 }
 

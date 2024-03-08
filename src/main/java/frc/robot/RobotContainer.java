@@ -127,13 +127,14 @@ public class RobotContainer {
         controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
         controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
 
+        //Amp
+        joystick.button(4).whileTrue(new AmpCommand(pivotSubsystem, true));
+
         //Spit
-        joystick.button(9).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+        joystick.button(6).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         // Drive
-        System.out.println("Out of Method Before: " + isFieldOriented);
         joystick.button(10).onTrue(toggleFieldOriented());
-        System.out.println("Out of Method After: " + isFieldOriented);
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -186,9 +187,7 @@ public class RobotContainer {
     }
 
     public Command toggleFieldOriented() {
-        System.out.println("In Method Before: " + isFieldOriented);
-        this.isFieldOriented = !isFieldOriented;
-        System.out.println("In Method After: " + isFieldOriented);
+        this.isFieldOriented = !this.isFieldOriented;
         debugFieldOriented.setBoolean(isFieldOriented);
         return new ParallelRaceGroup();
     }

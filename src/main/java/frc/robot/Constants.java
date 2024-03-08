@@ -35,10 +35,11 @@ public final class Constants {
         public final static int pivotEncoder2 = 2;
         public final static int outEncoderPosition = -950;
         public final static int inEncoderPosition = 0;
-        public static double pivotSpeed = -.5;
+        public static double pivotSpeed = -.8;
         public static int limitSwitch = 4;
         public static int pivotEncoder3 = 3;
-        public static double spitSpeed = .3;
+        public static double spitSpeed = 1;
+        public static int ampPosition = -300;
     }
 
     public static final class Auto {
@@ -50,8 +51,8 @@ public final class Constants {
         public final static double yDistanceToNote = 1.6;
         public final static double directionToNote = Math.atan(yDistanceToNote/(xDistanceToNote-.25)) * (180/Math.PI);
         public static double diagonalDistanceToNote  = Math.hypot((xDistanceToNote-.25), yDistanceToNote);
-        public static double normalSpeed = .5;
-        public static double slowSpeed = .3;
+        public static double normalSpeed = .9;
+        public static double slowSpeed = .5;
     }
 
     public static final class Align {

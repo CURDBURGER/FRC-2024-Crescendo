@@ -26,7 +26,7 @@ public class ClimberSubsystem extends SubsystemBase {
     public void periodic() {
         var leftSpeed = this.leftSpeed;
         var rightSpeed = this.rightSpeed;
-        leftClimberMotor.set(-leftSpeed);
+        leftClimberMotor.set(leftSpeed);
         rightClimberMotor.set(-rightSpeed);
 
     }
