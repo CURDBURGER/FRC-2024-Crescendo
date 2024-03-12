@@ -6,11 +6,11 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 public class ManualShooterCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
-    private final CommandJoystick joystick;
+    private final double speed;
 
-    public ManualShooterCommand(ShooterSubsystem shooterSubsystem, CommandJoystick joystick) {
+    public ManualShooterCommand(ShooterSubsystem shooterSubsystem, double speed) {
         this.shooterSubsystem = shooterSubsystem;
-        this.joystick = joystick;
+        this.speed = speed;
         addRequirements(shooterSubsystem);
     }
 
@@ -20,7 +20,6 @@ public class ManualShooterCommand extends Command {
 
     @Override
     public void execute() {
-        var speed = (-joystick.getThrottle() + 1) / 2;
         shooterSubsystem.setShooterSpeed(speed);
     }
 

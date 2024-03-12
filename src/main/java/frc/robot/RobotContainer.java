@@ -129,6 +129,7 @@ public class RobotContainer {
 
         //Amp
         joystick.button(4).whileTrue(new AmpCommand(pivotSubsystem, true));
+        controller.povDown().whileTrue(new AmpShooterCommand(shooterSubsystem, intakeSubsystem, Constants.Shooter.ampShootSpeed, Constants.Shooter.intakeShootSpeed ));
 
         //Spit
         joystick.button(6).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
@@ -161,7 +162,7 @@ public class RobotContainer {
     private Command getAutoShoot() {
         return new ParallelRaceGroup(
                 // spin up
-                new ManualShooterCommand(shooterSubsystem, joystick),
+                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
                 new SequentialCommandGroup(
                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
                         new ParallelRaceGroup(
@@ -175,7 +176,7 @@ public class RobotContainer {
     private Command getManualShoot() {
         return new ParallelRaceGroup(
                 // spin up
-                new ManualShooterCommand(shooterSubsystem, joystick),
+                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
                 new SequentialCommandGroup(
                         new TimerCommand(Constants.Shooter.revTime),
                         new ParallelRaceGroup(

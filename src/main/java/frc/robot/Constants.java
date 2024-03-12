@@ -11,6 +11,9 @@ public final class Constants {
         public static final int outtakeTime = 1500;
         public static final int revTime = 1000;
         public static final double backWheelPercent = .5;
+        public static double ampShootSpeed = .5;
+        public static double intakeShootSpeed = .3;
+        public static double speaker = 1;
     }
 
     public static class Climber {
@@ -35,7 +38,7 @@ public final class Constants {
         public final static int pivotEncoder2 = 2;
         public final static int outEncoderPosition = -950;
         public final static int inEncoderPosition = 0;
-        public static double pivotSpeed = -.8;
+        public static double pivotSpeed = -.65;
         public static int limitSwitch = 4;
         public static int pivotEncoder3 = 3;
         public static double spitSpeed = 1;
