@@ -16,6 +16,11 @@ public final class Constants {
         public static double speaker = 1;
     }
 
+    public static class Amp {
+        public static final int ampClimberSpeed = 1;
+        public static int ampClimberTime = 2000;
+    }
+
     public static class Climber {
         public static final int leftClimbMotorChannel = 2;
         public static final int rightClimbMotorChannel = 3;
@@ -56,6 +61,7 @@ public final class Constants {
         public static double diagonalDistanceToNote  = Math.hypot((xDistanceToNote-.25), yDistanceToNote);
         public static double normalSpeed = .9;
         public static double slowSpeed = .5;
+        public static double rotateSpeed = 2;
     }
 
     public static final class Align {

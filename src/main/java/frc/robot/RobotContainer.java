@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
+import frc.robot.commands.autoCommands.AmpAutoCommand;
 import frc.robot.commands.autoCommands.FourPieceCommand;
 import frc.robot.commands.autoCommands.LeaveCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
@@ -82,6 +83,7 @@ public class RobotContainer {
         autoChooser.addOption("Leave", AutoChoice.Leave);
         autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
         autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
+        autoChooser.addOption("Amp", AutoChoice.Amp);
         autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
 
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
@@ -111,28 +113,27 @@ public class RobotContainer {
         controller.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, false));
 
         // Auto shoot
-        joystick.trigger().whileTrue(getAutoShoot());
+//        joystick.trigger().whileTrue(getAutoShoot());
         controller.a().whileTrue(getAutoShoot());
 
         // Manual shoot
         joystick.button(2).onTrue(getManualShoot());
-        joystick.button(2).onTrue(getManualShoot());
+        joystick.trigger().onTrue(getManualShoot());
         controller.x().onTrue(getManualShoot());
 
         //Intake
-        joystick.button(5).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
         joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
         controller.y().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        controller.b().onTrue(new PivotCommand(pivotSubsystem, true));
-        controller.b().onFalse(new PivotCommand(pivotSubsystem, false));
+        controller.b().whileTrue(new PivotCommand(pivotSubsystem, true));
+        controller.b().whileFalse(new PivotCommand(pivotSubsystem, false));
 
         //Amp
-        joystick.button(4).whileTrue(new AmpCommand(pivotSubsystem, true));
-        controller.povDown().whileTrue(new AmpShooterCommand(shooterSubsystem, intakeSubsystem, Constants.Shooter.ampShootSpeed, Constants.Shooter.intakeShootSpeed ));
-
+        joystick.button(4).whileTrue(new ClimberCommand(climberSubsystem, Constants.Amp.ampClimberSpeed));
+        joystick.button(6).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Amp.ampClimberSpeed));
         //Spit
-        joystick.button(6).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+        joystick.button(8).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         // Drive
         joystick.button(10).onTrue(toggleFieldOriented());
@@ -148,7 +149,8 @@ public class RobotContainer {
                         () -> { // z+ is rotating counterclockwise
                             return -joystick.getTwist();
                         },
-                        isFieldOriented
+//                        joystick.button(10).getAsBoolean()
+                        true
                 )
         );
     }
@@ -188,8 +190,8 @@ public class RobotContainer {
     }
 
     public Command toggleFieldOriented() {
-        this.isFieldOriented = !this.isFieldOriented;
-        debugFieldOriented.setBoolean(isFieldOriented);
+//        this.isFieldOriented = !this.isFieldOriented;
+//        debugFieldOriented.setBoolean(isFieldOriented);
         return new ParallelRaceGroup();
     }
 
@@ -207,6 +209,9 @@ public class RobotContainer {
                 break;
             case FourPiece:
                 command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                break;
+            case Amp:
+                command = AmpAutoCommand.create(drive, climberSubsystem, pivotSubsystem, intakeSubsystem);
                 break;
             default:
                 command = new SequentialCommandGroup();
