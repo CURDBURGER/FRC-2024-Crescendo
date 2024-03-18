@@ -9,22 +9,16 @@ public final class Constants {
         public static final int backRightMotorChannel = 14;
         public static final double autoShooterSpeed = -1;
         public static final int outtakeTime = 1500;
-        public static final int revTime = 1000;
-        public static final double backWheelPercent = .5;
-        public static double ampShootSpeed = .5;
-        public static double intakeShootSpeed = .3;
+        public static final int revTime = 1500;
+        public static final double backWheelPercent = 1;
         public static double speaker = 1;
-    }
-
-    public static class Amp {
-        public static final int ampClimberSpeed = 1;
-        public static int ampClimberTime = 2000;
     }
 
     public static class Climber {
         public static final int leftClimbMotorChannel = 2;
         public static final int rightClimbMotorChannel = 3;
         public static final double climberSpeed = .5;
+        public static final int fastClimberSpeed = 1;
     }
 
     public static class WheelModule {
@@ -59,9 +53,10 @@ public final class Constants {
         public final static double yDistanceToNote = 1.6;
         public final static double directionToNote = Math.atan(yDistanceToNote/(xDistanceToNote-.25)) * (180/Math.PI);
         public static double diagonalDistanceToNote  = Math.hypot((xDistanceToNote-.25), yDistanceToNote);
-        public static double normalSpeed = .9;
-        public static double slowSpeed = .5;
+        public static double normalSpeed = .5;
+        public static double slowSpeed = .3;
         public static double rotateSpeed = 2;
+        public static double clearDistance = .67;
     }
 
     public static final class Align {
@@ -73,6 +68,6 @@ public final class Constants {
     }
 
     public static final double linearDeadband = 0.1;
-    public static final double rotationalDeadband = 0.3;
+    public static final double rotationalDeadband = 0.5;
 
 }

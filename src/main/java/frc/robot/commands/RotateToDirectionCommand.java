@@ -6,7 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 
-public class RotateToCommand extends Command {
+public class RotateToDirectionCommand extends Command {
     private final Drive drive;
     private double speed;
     private final double direction;
@@ -15,7 +15,7 @@ public class RotateToCommand extends Command {
     //speed in meters/second
     //distance in meters
     //direction in degrees from -180 to 180 right positive
-    public RotateToCommand(Drive drive, double speed, double direction) {
+    public RotateToDirectionCommand(Drive drive, double speed, double direction) {
         this.drive = drive;
         this.speed = speed;
         this.direction = Math.toRadians(direction);
@@ -46,6 +46,6 @@ public class RotateToCommand extends Command {
     @Override
     public boolean isFinished() {
         double distanceRot = Math.abs(drive.getPose().getRotation().getRadians()-initialPose.getRotation().getRadians());
-        return distanceRot >= direction;
+        return distanceRot >= Math.abs(direction);
     }
 }

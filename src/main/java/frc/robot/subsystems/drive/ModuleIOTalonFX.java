@@ -60,26 +60,26 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveSparkMax = new CANSparkMax(6, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(5, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(1);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(260); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(260);
         driveSparkMax.setInverted(false);
         break;
       case FRONT_RIGHT:
         driveSparkMax = new CANSparkMax(8, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(7, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(2);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(45); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(45);
         break;
       case BACK_LEFT:
         driveSparkMax = new CANSparkMax(1, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(2, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(3);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(262.33); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(262.33);
         break;
       case BACK_RIGHT:
         driveSparkMax = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(4);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(165); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromDegrees(165);
         break;
       default:
         throw new RuntimeException("Invalid module index");

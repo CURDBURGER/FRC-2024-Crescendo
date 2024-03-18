@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
@@ -14,10 +15,10 @@ public class ShooterSubsystem extends SubsystemBase {
     CANSparkMax backRightMotor;
 
     public ShooterSubsystem() {
-        this.frontLeftMotor = new CANSparkMax(Constants.Shooter.frontLeftMotorChannel, CANSparkMax.MotorType.kBrushed);
-        this.backLeftMotor = new CANSparkMax(Constants.Shooter.backLeftMotorChannel, CANSparkMax.MotorType.kBrushed);
-        this.frontRightMotor = new CANSparkMax(Constants.Shooter.frontRightMotorChannel, CANSparkMax.MotorType.kBrushed);
-        this.backRightMotor = new CANSparkMax(Constants.Shooter.backRightMotorChannel, CANSparkMax.MotorType.kBrushed);
+        this.frontLeftMotor = new CANSparkMax(Constants.Shooter.frontLeftMotorChannel, CANSparkMax.MotorType.kBrushless);
+        this.backLeftMotor = new CANSparkMax(Constants.Shooter.backLeftMotorChannel, CANSparkMax.MotorType.kBrushless);
+        this.frontRightMotor = new CANSparkMax(Constants.Shooter.frontRightMotorChannel, CANSparkMax.MotorType.kBrushless);
+        this.backRightMotor = new CANSparkMax(Constants.Shooter.backRightMotorChannel, CANSparkMax.MotorType.kBrushless);
     }
 
     public void setShooterSpeed(double speed) {
@@ -27,9 +28,9 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         var speed = this.speed;
-        frontLeftMotor.set(speed);
-        backLeftMotor.set(speed);
-        frontRightMotor.set(-speed);
-        backRightMotor.set(-speed);
+        frontLeftMotor.set(-speed);
+        backLeftMotor.set(-speed * Constants.Shooter.backWheelPercent);
+        frontRightMotor.set(speed);
+        backRightMotor.set(speed * Constants.Shooter.backWheelPercent);
     }
 }
