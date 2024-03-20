@@ -22,6 +22,7 @@ import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.*;
 import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.FieldOrientatedSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
@@ -45,6 +46,7 @@ public class RobotContainer {
     private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
+    private final FieldOrientatedSubsystem fieldOrientatedSubsystem = new FieldOrientatedSubsystem();
 
     //random vars
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
@@ -109,7 +111,7 @@ public class RobotContainer {
         controller.a().whileTrue(getAutoShoot());
 
         // Manual shoot
-        joystick.button(2).onTrue(getManualShoot());
+        //joystick.button(2).onTrue(getManualShoot());
         joystick.trigger().onTrue(getManualShoot());
         controller.x().onTrue(getManualShoot());
 
@@ -128,6 +130,7 @@ public class RobotContainer {
         // Drive
         joystick.button(9).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
         controller.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
+        joystick.button(2).onTrue(new FieldOrientatedCommand(fieldOrientatedSubsystem, true));
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -140,7 +143,7 @@ public class RobotContainer {
                         () -> { // z+ is rotating counterclockwise
                             return -joystick.getTwist();
                         },
-                        true
+                        fieldOrientatedSubsystem.getBooleanState()
                 )
         );
     }
