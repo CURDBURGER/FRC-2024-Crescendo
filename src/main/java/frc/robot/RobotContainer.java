@@ -14,14 +14,12 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
 import frc.robot.commands.autoCommands.LeaveCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
-import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -43,17 +41,13 @@ public class RobotContainer {
     private final Drive drive;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
     // Controller
-    private final CommandJoystick joystick = new CommandJoystick(0);
-    private final CommandXboxController controller = new CommandXboxController(1);
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController secondDriver = new CommandXboxController(1);
 
     // Dashboard inputs
 
@@ -96,60 +90,47 @@ public class RobotContainer {
      * JoystickButton}.
      */
     private void configureButtonBindings() {
-        // Climber
-        joystick.button(12).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.climberSpeed));
-        joystick.button(11).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
-        joystick.button(6).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        joystick.button(4).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        //Climber
+        driver.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        driver.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
+        secondDriver.start().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        secondDriver.back().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
 
-        controller.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        controller.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-
-        // Manual shoot
-        joystick.trigger().onTrue(getManualShoot());
-
-        controller.rightTrigger().onTrue(getManualShoot());
+        //Shooting
+        driver.rightTrigger().onTrue(getManualShoot());
 
         //Intake
-        joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
-        joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
-        joystick.button(7).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-
-        controller.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        controller.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
-        controller.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
-        controller.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-
+        driver.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        driver.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
+        driver.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
+        driver.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
 
         //Spit
-        joystick.button(8).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-
-        controller.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+        driver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+        secondDriver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         //Center
-        controller.povDown().whileTrue(getCentering());
+        driver.povDown().whileTrue(new ShimmyCommand(intakeSubsystem));
+        secondDriver.a().whileTrue(new ShimmyCommand(intakeSubsystem));
 
-        // Drive
-        joystick.button(9).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        joystick.button(2).onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
-        controller.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        controller.povLeft().onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
+        //Drive
+        driver.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
+        driver.povLeft().onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
 
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
                         () -> { // x forward is front, -x is backward
 //                            return joystick.getY();
-                            return controller.getLeftY();
+                            return driver.getLeftY();
                         },
                         () -> { // y+ is to the left, y- is to the right
 //                            return -joystick.getX();
-                            return -controller.getLeftX();
+                            return -driver.getLeftX();
                         },
                         () -> { // z+ is rotating counterclockwise
 //                            return -joystick.getTwist();
-                            return -controller.getRightX();
+                            return -driver.getRightX();
                         }
                 )
         );
@@ -161,20 +142,20 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
 
-    private Command getAutoShoot() {
-        return new ParallelRaceGroup(
-                // spin up
-                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
-                new SequentialCommandGroup(
-                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
-                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
-                        new ParallelRaceGroup(
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                                new TimerCommand(Constants.Shooter.outtakeTime)
-                        )
-                )
-        );
-    }
+//    private Command getAutoShoot() {
+//        return new ParallelRaceGroup(
+//                // spin up
+//                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
+//                new SequentialCommandGroup(
+//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
+//                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
+//                        new ParallelRaceGroup(
+//                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
+//                                new TimerCommand(Constants.Shooter.outtakeTime)
+//                        )
+//                )
+//        );
+//    }
 
     private Command getManualShoot() {
         return new ParallelRaceGroup(
@@ -189,22 +170,6 @@ public class RobotContainer {
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
-                        )
-                )
-        );
-    }
-
-    public Command getCentering() {
-        return new RepeatCommand(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new TimerCommand(200),
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
-                        ),
-                        new TimerCommand(100),
-                        new ParallelRaceGroup(
-                                new TimerCommand(200),
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed)
                         )
                 )
         );

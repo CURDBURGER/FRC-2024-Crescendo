@@ -44,10 +44,12 @@ public class TwoPieceCommand extends Command {
                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelRaceGroup(
+                        new ShimmyCommand(intakeSubsystem),
                         new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + .2, 180),
                         new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
+                        new ShimmyCommand(intakeSubsystem),
                         new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, .001, 180)),
                 new ParallelRaceGroup(
                         // spin up
