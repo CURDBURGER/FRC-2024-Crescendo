@@ -68,6 +68,6 @@ public final class Constants {
     }
 
     public static final double linearDeadband = 0.1;
-    public static final double rotationalDeadband = 0.5;
+    public static final double rotationalDeadband = .1;
 
 }

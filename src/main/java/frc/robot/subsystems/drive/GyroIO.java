@@ -14,4 +14,7 @@ public interface GyroIO {
 
     default void updateInputs(GyroIOInputs inputs) {
     }
+
+    default void resetGyro() {
+    }
 }

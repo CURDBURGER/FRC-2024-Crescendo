@@ -48,8 +48,9 @@ public class RobotContainer {
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
-    private boolean isFieldOriented = true;
-
+    private final int translationAxis = XboxController.Axis.kLeftY.value;
+    private final int strafeAxis = XboxController.Axis.kLeftX.value;
+    private final int rotationAxis = XboxController.Axis.kRightX.value;
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
     private final CommandXboxController controller = new CommandXboxController(1);
@@ -85,7 +86,7 @@ public class RobotContainer {
         new PivotCommand(pivotSubsystem, false);
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
-
+        drive.resetGyro();
     }
 
     /**
@@ -100,42 +101,53 @@ public class RobotContainer {
         joystick.button(11).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
         joystick.button(6).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
         joystick.button(4).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        controller.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, true));
-        controller.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, true));
-        controller.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, false));
-        controller.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, false));
+
+        controller.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
+        controller.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
 
         // Manual shoot
         joystick.trigger().onTrue(getManualShoot());
-        controller.b().whileTrue(new ManualShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed));
+
+        controller.rightTrigger().onTrue(getManualShoot());
 
         //Intake
         joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        joystick.button(7).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
         joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
-        controller.x().whileTrue(new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed));
+        joystick.button(7).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+
+        controller.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        controller.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
+        controller.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
+        controller.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
 
 
         //Spit
         joystick.button(8).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-        controller.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+
+        controller.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
 
         // Drive
         joystick.button(9).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
         joystick.button(2).onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
+        controller.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
+        controller.povLeft().onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
+
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
                         () -> { // x forward is front, -x is backward
-                            return joystick.getY();
+//                            return joystick.getY();
+                            return controller.getLeftY();
                         },
                         () -> { // y+ is to the left, y- is to the right
-                            return -joystick.getX();
+//                            return -joystick.getX();
+                            return -controller.getLeftX();
                         },
                         () -> { // z+ is rotating counterclockwise
-                            return -joystick.getTwist();
+//                            return -joystick.getTwist();
+                            return -controller.getRightX();
                         }
                 )
         );

@@ -272,6 +272,10 @@ public class Drive extends SubsystemBase {
         this.pose = pose;
     }
 
+    public void resetGyro() {
+        gyroIO.resetGyro();
+    }
+
     /**
      * Returns the maximum linear speed in meters per sec.
      */
