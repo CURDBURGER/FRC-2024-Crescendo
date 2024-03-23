@@ -102,8 +102,8 @@ public class RobotContainer {
         joystick.button(6).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
         joystick.button(4).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
 
-        controller.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        controller.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        controller.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        controller.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
 
         // Manual shoot
         joystick.trigger().onTrue(getManualShoot());
@@ -127,6 +127,8 @@ public class RobotContainer {
 
         controller.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
+        //Center
+        controller.povDown().whileTrue(getCentering());
 
         // Drive
         joystick.button(9).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
@@ -187,6 +189,22 @@ public class RobotContainer {
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
+                )
+        );
+    }
+
+    public Command getCentering() {
+        return new RepeatCommand(
+                new SequentialCommandGroup(
+                        new ParallelRaceGroup(
+                                new TimerCommand(200),
+                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
+                        ),
+                        new TimerCommand(100),
+                        new ParallelRaceGroup(
+                                new TimerCommand(200),
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed)
                         )
                 )
         );

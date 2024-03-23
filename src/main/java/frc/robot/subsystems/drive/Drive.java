@@ -25,7 +25,7 @@ import static frc.robot.Constants.WheelModule.*;
 
 public class Drive extends SubsystemBase {
 
-    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(10.5);
+    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
     private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
     private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
     private static final double DRIVE_BASE_RADIUS =
@@ -99,18 +99,19 @@ public class Drive extends SubsystemBase {
         gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
         gyroRollDebug.setDouble(gyroInputs.rollPosition.getDegrees());
         gyroPitchDebug.setDouble(gyroInputs.pitchPosition.getDegrees());
-        if (gyroInputs.connected) {
-            // If the gyro is connected, replace the theta component of the twist
-            // with the change in angle since the last loop cycle.
-            twist = new Twist2d(
-                    twist.dx,
-                    twist.dy,
-                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
-            );
-            lastGyroRotation = gyroInputs.yawPosition;
-        }
+//        if (gyroInputs.connected) {
+//            // If the gyro is connected, replace the theta component of the twist
+//            // with the change in angle since the last loop cycle.
+//            twist = new Twist2d(
+//                    twist.dx,
+//                    twist.dy,
+//                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+//            );
+//            lastGyroRotation = gyroInputs.yawPosition;
+//        }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
+
         poseXDebug.setDouble(pose.getX());
         poseYDebug.setDouble(pose.getY());
         poseRotDebug.setDouble(pose.getRotation().getDegrees());

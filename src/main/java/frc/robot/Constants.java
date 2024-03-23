@@ -53,8 +53,8 @@ public final class Constants {
         public final static double yDistanceToNote = 1.6;
         public final static double directionToNote = Math.atan(yDistanceToNote/(xDistanceToNote-.25)) * (180/Math.PI);
         public static double diagonalDistanceToNote  = Math.hypot((xDistanceToNote-.25), yDistanceToNote);
-        public static double normalSpeed = .5;
-        public static double slowSpeed = .3;
+        public static double normalSpeed = .08;
+        public static double slowSpeed = .05;
         public static double rotateSpeed = 2;
         public static double clearDistance = .67;
     }

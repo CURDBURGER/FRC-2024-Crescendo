@@ -14,7 +14,7 @@ import frc.robot.subsystems.pickup.PivotSubsystem;
 public class TwoPieceCommand extends Command {
     public static Command create(Drive drive, IntakeSubsystem intakeSubsystem, PivotSubsystem pivotSubsystem, ShooterSubsystem shooterSubsystem) {
         return new SequentialCommandGroup(
-                new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, .56, 0),
+                new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, .3, 0),
                 new ParallelRaceGroup(
                         // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
@@ -35,7 +35,7 @@ public class TwoPieceCommand extends Command {
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote - .8, 0),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote - .5, 0),
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
@@ -65,7 +65,7 @@ public class TwoPieceCommand extends Command {
                         )
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, .8, Constants.Auto.xDistanceToNote + 1, 0),
+                        new DriveToPoseCommand(drive, .1, Constants.Auto.xDistanceToNote + 1, 0),
                         new PivotCommand(pivotSubsystem, false)
                 )
         );
