@@ -33,7 +33,7 @@ public class Module {
 
     private final static ModulePidConfig[] configs = {
 
-            new ModulePidConfig(             //FL
+            new ModulePidConfig( //FL
                     new FeedForwardParams(0.1, 0.13),
                     new PidConfig(0.05, 0.0, 0.0), // drive
                     new PidConfig(3, 0.0, 0.0)     // turn
@@ -71,9 +71,9 @@ public class Module {
         var config = configs[index];
 
         // Constants here may change for SIM
-        driveFeedforward = new SimpleMotorFeedforward(config.driveFeedForward().kS(), config.driveFeedForward().kV());
-        driveFeedback = new PIDController(config.drivePid().kP(), config.drivePid().kI(), config.drivePid().kD());
-        turnFeedback = new PIDController(config.turnPid().kP(), config.turnPid().kI(), config.turnPid().kD());
+        driveFeedforward = config.driveFeedForward().toSimpleMotorFeedforward();
+        driveFeedback = config.drivePid().toPidController();
+        turnFeedback =config.turnPid().toPidController();
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
         setBrakeMode(true);
