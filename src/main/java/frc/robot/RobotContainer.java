@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,10 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-import frc.robot.commands.autoCommands.*;
+import frc.robot.commands.autoCommands.FourPieceCommand;
+import frc.robot.commands.autoCommands.LeaveCommand;
+import frc.robot.commands.autoCommands.TwoPieceCommand;
 import frc.robot.subsystems.AprilTagSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.FieldOrientatedSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
@@ -46,10 +46,9 @@ public class RobotContainer {
     private final AprilTagSubsystem aprilTagSubsystem = new AprilTagSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
-    private final FieldOrientatedSubsystem fieldOrientatedSubsystem = new FieldOrientatedSubsystem();
-
     //random vars
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+    private boolean isFieldOriented = true;
 
     // Controller
     private final CommandJoystick joystick = new CommandJoystick(0);
@@ -88,6 +87,7 @@ public class RobotContainer {
         drive.straightenWheels();
 
     }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be created by
      * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -100,37 +100,31 @@ public class RobotContainer {
         joystick.button(11).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
         joystick.button(6).whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
         joystick.button(4).whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        controller.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.climberSpeed));
-        controller.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed));
         controller.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, true));
         controller.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, true));
         controller.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.climberSpeed, false));
         controller.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.climberSpeed, false));
 
-        // Auto shoot
-        controller.a().whileTrue(getAutoShoot());
-
         // Manual shoot
-        //joystick.button(2).onTrue(getManualShoot());
         joystick.trigger().onTrue(getManualShoot());
-        controller.x().onTrue(getManualShoot());
+        controller.b().whileTrue(new ManualShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed));
 
         //Intake
         joystick.button(3).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         joystick.button(7).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
         joystick.button(3).whileTrue(new PivotCommand(pivotSubsystem, true));
         joystick.button(3).whileFalse(new PivotCommand(pivotSubsystem, false));
-        controller.y().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        controller.b().whileTrue(new PivotCommand(pivotSubsystem, true));
-        controller.b().whileFalse(new PivotCommand(pivotSubsystem, false));
+        controller.x().whileTrue(new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed));
+
 
         //Spit
         joystick.button(8).whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+        controller.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
+
 
         // Drive
         joystick.button(9).onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        controller.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        joystick.button(2).onTrue(new FieldOrientatedCommand(fieldOrientatedSubsystem, true));
+        joystick.button(2).onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         drive,
@@ -142,8 +136,7 @@ public class RobotContainer {
                         },
                         () -> { // z+ is rotating counterclockwise
                             return -joystick.getTwist();
-                        },
-                        fieldOrientatedSubsystem.getBooleanState()
+                        }
                 )
         );
     }
@@ -168,6 +161,7 @@ public class RobotContainer {
                 )
         );
     }
+
     private Command getManualShoot() {
         return new ParallelRaceGroup(
                 // spin up
@@ -185,6 +179,7 @@ public class RobotContainer {
                 )
         );
     }
+
     public Command getAutonomousCommand() {
         //Getting shuffleboard value
         AutoChoice autoChoice = autoChooser.getSelected();

@@ -78,7 +78,7 @@
                  doneMovingForward = true;
              }
 
-             drive.runVelocity(new ChassisSpeeds(xVelocity, yVelocity, 0));
+//             drive.runVelocity(new ChassisSpeeds(xVelocity, yVelocity, 0));
 
          } else{
 //             canSeeSpeakerTag.setDoubleBoolean(false);

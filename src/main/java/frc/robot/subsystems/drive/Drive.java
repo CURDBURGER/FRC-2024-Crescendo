@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -34,6 +35,8 @@ public class Drive extends SubsystemBase {
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private GenericEntry gyroYawDebug;
+    private GenericEntry gyroRollDebug;
+    private GenericEntry gyroPitchDebug;
     private GenericEntry poseXDebug;
     private GenericEntry poseYDebug;
     private GenericEntry poseRotDebug;
@@ -44,6 +47,7 @@ public class Drive extends SubsystemBase {
     private Pose2d pose = new Pose2d();
     private Rotation2d lastGyroRotation = new Rotation2d();
     private StructArrayPublisher<SwerveModuleState> publisher;
+    private boolean isFieldOriented = true;
 
     public Drive(
             GyroIO gyroIO,
@@ -62,6 +66,8 @@ public class Drive extends SubsystemBase {
                 .getStructArrayTopic("MyStates", SwerveModuleState.struct)
                 .publish();
         gyroYawDebug = Shuffleboard.getTab("General").add("Gyro Yaw", 0).getEntry();
+        gyroRollDebug = Shuffleboard.getTab("General").add("Gyro Roll", 0).getEntry();
+        gyroPitchDebug = Shuffleboard.getTab("General").add("Gyro Pitch", 0).getEntry();
         poseXDebug = Shuffleboard.getTab("General").add("Pose X", 0).getEntry();
         poseYDebug = Shuffleboard.getTab("General").add("Pose Y", 0).getEntry();
         poseRotDebug = Shuffleboard.getTab("General").add("Pose Rotation", 0).getEntry();
@@ -90,17 +96,19 @@ public class Drive extends SubsystemBase {
         // loop cycle in x, y, and theta based only on the modules,
         // without the gyro. The gyro is always disconnected in simulation.
         var twist = kinematics.toTwist2d(wheelDeltas);
-//        gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
-//        if (gyroInputs.connected) {
-//            // If the gyro is connected, replace the theta component of the twist
-//            // with the change in angle since the last loop cycle.
-//            twist = new Twist2d(
-//                    twist.dx,
-//                    twist.dy,
-//                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
-//            );
-//            lastGyroRotation = gyroInputs.yawPosition;
-//        }
+        gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
+        gyroRollDebug.setDouble(gyroInputs.rollPosition.getDegrees());
+        gyroPitchDebug.setDouble(gyroInputs.pitchPosition.getDegrees());
+        if (gyroInputs.connected) {
+            // If the gyro is connected, replace the theta component of the twist
+            // with the change in angle since the last loop cycle.
+            twist = new Twist2d(
+                    twist.dx,
+                    twist.dy,
+                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+            );
+            lastGyroRotation = gyroInputs.yawPosition;
+        }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
         poseXDebug.setDouble(pose.getX());
@@ -113,9 +121,47 @@ public class Drive extends SubsystemBase {
     /**
      * Runs the drive at the desired velocity.
      *
-     * @param speeds Speeds in meters/sec
+//     * @param speeds Speeds in meters/sec
      */
-    public void runVelocity(ChassisSpeeds speeds) {
+//    public void runVelocity(ChassisSpeeds speeds) {
+//
+//        // Calculate module setpoints
+//        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+//        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+//        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+//
+//        // Send setpoints to modules
+//        SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
+//        for (int i = 0; i < 4; i++) {
+//            // The module returns the optimized state, useful for logging
+//            optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
+//        }
+//
+//        optimizedSetpointStates = setpointStates;
+//
+//        publisher.set(optimizedSetpointStates);
+//
+//
+//        // Log setpoint states
+////        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+////        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+//
+//    }
+
+        public void runVelocity(Translation2d linearVelocity, double omega) {
+            Rotation2d rotation;
+            if (isFieldOriented) {
+                rotation = getRotation();
+            } else {
+                rotation = new Rotation2d(0);
+            }
+            ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX() * MAX_LINEAR_SPEED,
+                    linearVelocity.getY() * MAX_LINEAR_SPEED,
+                    omega * MAX_ANGULAR_SPEED,
+                    rotation
+            );
+
         // Calculate module setpoints
         ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
@@ -143,7 +189,11 @@ public class Drive extends SubsystemBase {
      * Stops the drive.
      */
     public void stop() {
-        runVelocity(new ChassisSpeeds());
+        runVelocity(new Translation2d(), 0);
+    }
+
+    public void toggleIsFieldOriented() {
+        isFieldOriented = !isFieldOriented;
     }
 
     /**

@@ -33,8 +33,8 @@ public class DriveCommands {
             Drive drive,
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
-            DoubleSupplier omegaSupplier,
-            boolean isFieldOriented) {
+            DoubleSupplier omegaSupplier
+            ) {
         return Commands.run(
                 () -> {
                     // Apply deadband
@@ -60,25 +60,28 @@ public class DriveCommands {
                                     .getTranslation();
 
                     // Convert to field relative speeds & send command
-                    if(isFieldOriented){
-                        drive.runVelocity(
-                                ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        omega * drive.getMaxAngularSpeedRadPerSec(),
-                                        drive.getRotation()
-                                )
-                        );
-                    } else {
-                        drive.runVelocity(
-                                ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                        omega * drive.getMaxAngularSpeedRadPerSec(),
-                                        new Rotation2d(0)
-                                )
-                        );
-                    }
+
+                    drive.runVelocity(linearVelocity, omega);
+
+//                    if(isFieldOriented){
+//                        drive.runVelocity(
+//                                ChassisSpeeds.fromFieldRelativeSpeeds(
+//                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+//                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+//                                        omega * drive.getMaxAngularSpeedRadPerSec(),
+//                                        drive.getRotation()
+//                                )
+//                        );
+//                    } else {
+//                        drive.runVelocity(
+//                                ChassisSpeeds.fromFieldRelativeSpeeds(
+//                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+//                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+//                                        omega * drive.getMaxAngularSpeedRadPerSec(),
+//                                        new Rotation2d(0)
+//                                )
+//                        );
+//                    }
                 },
                 drive);
     }

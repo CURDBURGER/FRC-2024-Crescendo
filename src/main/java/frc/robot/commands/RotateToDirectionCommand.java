@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 
@@ -30,22 +30,20 @@ public class RotateToDirectionCommand extends Command {
     @Override
     public void execute() {
         Rotation2d rotation = drive.getRotation();
-        if(direction <= 0){
+        if (direction <= 0) {
             speed = speed * -1;
         }
-        drive.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, speed, rotation)
-        );
+        drive.runVelocity(new Translation2d(0, 0), speed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        drive.runVelocity(new ChassisSpeeds(0, 0, 0));
+//        drive.runVelocity(new ChassisSpeeds(0, 0, 0));
     }
 
     @Override
     public boolean isFinished() {
-        double distanceRot = Math.abs(drive.getPose().getRotation().getRadians()-initialPose.getRotation().getRadians());
+        double distanceRot = Math.abs(drive.getPose().getRotation().getRadians() - initialPose.getRotation().getRadians());
         return distanceRot >= Math.abs(direction);
     }
 }

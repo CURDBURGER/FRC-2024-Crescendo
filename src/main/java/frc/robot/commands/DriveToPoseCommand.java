@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -37,14 +38,12 @@ public class DriveToPoseCommand extends Command {
         Rotation2d rotation = drive.getRotation();
         double xSpeed = speed*Math.cos(direction);
         double ySpeed = -speed*Math.sin(direction);
-        drive.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, 0, rotation)
-        );
+        drive.runVelocity( new Translation2d(xSpeed, ySpeed), 0);
     }
 
     @Override
     public void end(boolean interrupted) {
-        drive.runVelocity(new ChassisSpeeds(0, 0, 0));
+//        drive.runVelocity(new ChassisSpeeds(0, 0, 0));
     }
 
     @Override
