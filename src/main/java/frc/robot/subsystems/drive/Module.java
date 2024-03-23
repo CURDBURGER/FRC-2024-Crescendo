@@ -31,6 +31,32 @@ public class Module {
     private double lastPositionMeters = 0.0; // Used for delta calculation
 
 
+    private final static ModulePidConfig[] configs = {
+
+            new ModulePidConfig(             //FL
+                    new FeedForwardParams(0.1, 0.13),
+                    new PidConfig(0.05, 0.0, 0.0), // drive
+                    new PidConfig(3, 0.0, 0.0)     // turn
+            ),
+            new ModulePidConfig( // FR
+                    new FeedForwardParams(0.1, 0.13),
+                    new PidConfig(0.05, 0.0, 0.0), // drive
+                    new PidConfig(3, 0.0, 0.0)     // turn
+            ),
+            new ModulePidConfig( // BL
+                    new FeedForwardParams(0.1, 0.13),
+                    new PidConfig(0.05, 0.0, 0.0), // drive
+                    new PidConfig(3, 0.0, 0.0)     // turn
+            ),
+            new ModulePidConfig( // BR
+                    new FeedForwardParams(0.1, 0.13),
+                    new PidConfig(0.05, 0.0, 0.0), // drive
+                    new PidConfig(3, 0.0, 0.0)     // turn
+            )
+
+    };
+
+
     public Module(ModuleIO io, int index, String title) {
         this.io = io;
         this.index = index;
@@ -42,13 +68,12 @@ public class Module {
         targetAngle = tab.add("Target Angle" + title, 0).getEntry();
         targetVelocity = tab.add("Target Velocity" + title, 0).getEntry();
 
+        var config = configs[index];
 
         // Constants here may change for SIM
-
-        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
-        driveFeedback = new PIDController(0.05, 0.0, 0.0);
-        turnFeedback = new PIDController(3, 0.0, 0.0);
-
+        driveFeedforward = new SimpleMotorFeedforward(config.driveFeedForward().kS(), config.driveFeedForward().kV());
+        driveFeedback = new PIDController(config.drivePid().kP(), config.drivePid().kI(), config.drivePid().kD());
+        turnFeedback = new PIDController(config.turnPid().kP(), config.turnPid().kI(), config.turnPid().kD());
 
         turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
         setBrakeMode(true);
