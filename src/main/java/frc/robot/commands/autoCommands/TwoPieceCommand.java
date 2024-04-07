@@ -14,7 +14,6 @@ import frc.robot.subsystems.pickup.PivotSubsystem;
 public class TwoPieceCommand extends Command {
     public static Command create(Drive drive, IntakeSubsystem intakeSubsystem, PivotSubsystem pivotSubsystem, ShooterSubsystem shooterSubsystem) {
         return new SequentialCommandGroup(
-                new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, .3, 0),
                 new ParallelRaceGroup(
                         // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
@@ -23,7 +22,7 @@ public class TwoPieceCommand extends Command {
                                         new TimerCommand(500),
                                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                                 ),
-                                new TimerCommand(1000),
+                                new TimerCommand(250),
                                 new ParallelRaceGroup(
                                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                         new TimerCommand(Constants.Shooter.outtakeTime)
@@ -35,7 +34,7 @@ public class TwoPieceCommand extends Command {
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote - .5, 0),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote - .2, 0),
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
@@ -44,13 +43,9 @@ public class TwoPieceCommand extends Command {
                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelRaceGroup(
-                        new ShimmyCommand(intakeSubsystem),
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + .2, 180),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + .5, 180),
                         new PivotCommand(pivotSubsystem, false)
                 ),
-                new ParallelRaceGroup(
-                        new ShimmyCommand(intakeSubsystem),
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, .001, 180)),
                 new ParallelRaceGroup(
                         // spin up
                         new AutomaticShooterCommand(shooterSubsystem, Constants.Shooter.autoShooterSpeed),
@@ -59,7 +54,7 @@ public class TwoPieceCommand extends Command {
                                         new TimerCommand(500),
                                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                                 ),
-                                new TimerCommand(1000),
+                                new TimerCommand(250),
                                 new ParallelRaceGroup(
                                         new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                         new TimerCommand(Constants.Shooter.outtakeTime)
@@ -67,7 +62,7 @@ public class TwoPieceCommand extends Command {
                         )
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, .1, Constants.Auto.xDistanceToNote + 1, 0),
+                        new DriveToPoseCommand(drive, .15, Constants.Auto.xDistanceToNote + 1.3, 0),
                         new PivotCommand(pivotSubsystem, false)
                 )
         );

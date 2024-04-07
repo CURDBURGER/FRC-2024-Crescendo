@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.autoCommands.FourPieceCommand;
 import frc.robot.commands.autoCommands.LeaveCommand;
+import frc.robot.commands.autoCommands.OnePieceCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -69,6 +70,7 @@ public class RobotContainer {
         configureButtonBindings();
 
         autoChooser.addOption("Leave", AutoChoice.Leave);
+        autoChooser.addOption("One Piece", AutoChoice.OnePiece);
         autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
         autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
         autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
@@ -81,6 +83,7 @@ public class RobotContainer {
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
+        climberSubsystem.resetEncoders();
     }
 
     /**
@@ -93,8 +96,12 @@ public class RobotContainer {
         //Climber
         driver.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
         driver.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        secondDriver.start().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        secondDriver.back().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
+        secondDriver.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
+        secondDriver.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
+        secondDriver.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, true));
+        secondDriver.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, true));
+        secondDriver.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, false));
+        secondDriver.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, false));
 
         //Shooting
         driver.rightTrigger().onTrue(getManualShoot());
@@ -104,14 +111,16 @@ public class RobotContainer {
         driver.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
         driver.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
         driver.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        secondDriver.y().onTrue(Commands.runOnce(() -> pivotSubsystem.setOverwrite(true)));
+        secondDriver.y().onFalse(Commands.runOnce(() -> pivotSubsystem.setOverwrite(false)));
 
         //Spit
         driver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
         secondDriver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
 
         //Center
-        driver.povDown().whileTrue(new ShimmyCommand(intakeSubsystem));
-        secondDriver.a().whileTrue(new ShimmyCommand(intakeSubsystem));
+        driver.povDown().whileTrue(getCentering());
+        secondDriver.a().whileTrue(getCentering());
 
         //Drive
         driver.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
@@ -166,10 +175,25 @@ public class RobotContainer {
                                 new TimerCommand(500),
                                 new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                         ),
-                        new TimerCommand(1000),
+                        new TimerCommand(250),
                         new ParallelRaceGroup(
                                 new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
                                 new TimerCommand(Constants.Shooter.outtakeTime)
+                        )
+                )
+        );
+    }
+    public Command getCentering() {
+        return new RepeatCommand(
+                new SequentialCommandGroup(
+                        new ParallelRaceGroup(
+                                new TimerCommand(250),
+                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
+                        ),
+                        new TimerCommand(100),
+                        new ParallelRaceGroup(
+                                new TimerCommand(200),
+                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed)
                         )
                 )
         );
@@ -182,6 +206,9 @@ public class RobotContainer {
         switch (autoChoice) {
             case Leave:
                 command = LeaveCommand.create(drive);
+                break;
+            case OnePiece:
+                command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
                 break;
             case TwoPiece:
                 command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);

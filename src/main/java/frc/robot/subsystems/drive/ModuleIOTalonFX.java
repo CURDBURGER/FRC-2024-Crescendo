@@ -79,7 +79,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveSparkMax = new CANSparkMax(3, CANSparkLowLevel.MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(4, CANSparkLowLevel.MotorType.kBrushless);
         cancoder = new CANcoder(4);
-        absoluteEncoderOffset = Rotation2d.fromDegrees(165);
+        absoluteEncoderOffset = Rotation2d.fromDegrees(217.5);
         break;
       default:
         throw new RuntimeException("Invalid module index");

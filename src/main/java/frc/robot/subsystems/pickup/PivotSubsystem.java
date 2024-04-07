@@ -14,6 +14,7 @@ public class PivotSubsystem extends SubsystemBase {
     public enum PivotPosition {
         in, out, amp;
     }
+    private boolean overwrite;
 
     private final PWMVictorSPX pivotMotor;
     private final Encoder pivotEncoder;
@@ -21,7 +22,6 @@ public class PivotSubsystem extends SubsystemBase {
     private static ShuffleboardTab tab = Shuffleboard.getTab("General");
     private static GenericEntry encoderPosition = tab.add("Encoder Position", 0.0).getEntry();
     private static GenericEntry limitSwitchOn = tab.add("Limit Switch", false).getEntry();
-
 
 
     private PivotPosition pivotPosition = PivotPosition.in;
@@ -35,6 +35,7 @@ public class PivotSubsystem extends SubsystemBase {
     public void setPivotPosition(PivotPosition pivotPosition) {
         this.pivotPosition = pivotPosition;
     }
+    public void setOverwrite(boolean overwrite){this.overwrite = overwrite;}
 
     @Override
     public void periodic() {
@@ -45,15 +46,18 @@ public class PivotSubsystem extends SubsystemBase {
         limitSwitchOn.setBoolean(!limitSwitch.get());
 
         var position = pivotEncoder.get();
-        if (pivotPosition == PivotPosition.out && position > Constants.NotePickup.outEncoderPosition) {
-            pivotMotor.set(Constants.NotePickup.pivotSpeed);
-        } else if (pivotPosition == pivotPosition.in && position < Constants.NotePickup.inEncoderPosition  && limitSwitch.get() == true) {
+        if (overwrite) {
             pivotMotor.set(-Constants.NotePickup.pivotSpeed);
-        } else if (pivotPosition == pivotPosition.amp && position > Constants.NotePickup.ampPosition){
+        } else if (pivotPosition == PivotPosition.out && position > Constants.NotePickup.outEncoderPosition) {
+            pivotMotor.set(Constants.NotePickup.pivotSpeed);
+        } else if (pivotPosition == pivotPosition.in && position < Constants.NotePickup.inEncoderPosition && limitSwitch.get() == true) {
+            pivotMotor.set(-Constants.NotePickup.pivotSpeed);
+        } else if (pivotPosition == pivotPosition.amp && position > Constants.NotePickup.ampPosition) {
             pivotMotor.set(Constants.NotePickup.pivotSpeed);
         } else {
             pivotMotor.set(0);
         }
+
     }
 }
 

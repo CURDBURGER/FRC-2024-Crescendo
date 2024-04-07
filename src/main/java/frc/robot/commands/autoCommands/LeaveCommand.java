@@ -14,7 +14,7 @@ public class LeaveCommand {
     public static Command create(Drive drive) {
         return new SequentialCommandGroup(
                 new TimerCommand(10000),
-                new DriveToPoseCommand(drive, .7,3, 0)
+                new DriveToPoseCommand(drive, .3,3, 0)
         );
     }
 

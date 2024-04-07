@@ -1,5 +1,5 @@
 package frc.robot;
 
 public enum AutoChoice {
-    Leave, TwoPiece, FourPiece
+    Leave, OnePiece, TwoPiece, FourPiece
 }

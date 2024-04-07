@@ -19,6 +19,10 @@ public final class Constants {
         public static final int rightClimbMotorChannel = 3;
         public static final double climberSpeed = .5;
         public static final int fastClimberSpeed = 1;
+        public static int leftEncoder1 = 5;
+        public static int leftEncoder2 = 6;
+        public static int rightEncoder1 = 7;
+        public static int rightEncoder2 = 8;
     }
 
     public static class WheelModule {
@@ -53,8 +57,10 @@ public final class Constants {
         public final static double yDistanceToNote = 1.6;
         public final static double directionToNote = Math.atan(yDistanceToNote/(xDistanceToNote-.25)) * (180/Math.PI);
         public static double diagonalDistanceToNote  = Math.hypot((xDistanceToNote-.25), yDistanceToNote);
-        public static double normalSpeed = .08;
-        public static double slowSpeed = .05;
+        public static double normalSpeed = .12;
+        public static double fastSpeed = .25;
+        public static double diagonalSpeed = .2;
+        public static double slowSpeed = .12;
         public static double rotateSpeed = 2;
         public static double clearDistance = .67;
     }
