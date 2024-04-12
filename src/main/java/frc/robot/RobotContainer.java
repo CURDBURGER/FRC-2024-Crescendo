@@ -29,7 +29,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
 
-import static frc.robot.Constants.WheelModule.*;
+import static frc.robot.Constants.Swerve.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

@@ -1,5 +1,11 @@
 package frc.robot;
 
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.util.Units;
+
 public final class Constants {
 
     public static class Shooter {
@@ -25,12 +31,16 @@ public final class Constants {
         public static int rightEncoder2 = 8;
     }
 
-    public static class WheelModule {
+    public static class Swerve {
         public static final int FRONT_LEFT = 0;
         public static final int FRONT_RIGHT = 1;
         public static final int BACK_LEFT = 2;
         public static final int BACK_RIGHT = 3;
-    }
+        public static final double MAX_LINEAR_SPEED = Units.feetToMeters(7);
+        private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
+        private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
+        private static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
+        }
 
     // TODO
     public static final class NotePickup {
@@ -72,6 +82,14 @@ public final class Constants {
         public static final double shooterRange = .75;
         public static double alignSpeed = 2.6;
     }
+
+    public static final HolonomicPathFollowerConfig pathFollowerConfig = new HolonomicPathFollowerConfig(
+                                new PIDConstants(.5, 0, 0), // 2.0 Translation constants 3
+                                new PIDConstants(3, 0, 0), // 1.3 Rotation constants 3
+                                Swerve.MAX_LINEAR_SPEED,
+                                flModuleOffset.getNorm(), // Drive base radius (distance from center to furthest module)
+                                new ReplanningConfig());
+
 
     public static final double linearDeadband = 0.1;
     public static final double rotationalDeadband = .1;

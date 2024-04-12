@@ -16,8 +16,17 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
-import static frc.robot.Constants.WheelModule.*;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
+import static frc.robot.Constants.Swerve.*;
 
 
 // import frc.robot.util.LocalADStarAK;
@@ -25,11 +34,10 @@ import static frc.robot.Constants.WheelModule.*;
 
 public class Drive extends SubsystemBase {
 
-    private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-    private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-    private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
-    private static final double DRIVE_BASE_RADIUS =
-            Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
+    private static final double MAX_LINEAR_SPEED = Constants.Swerve.MAX_LINEAR_SPEED;
+    private static final double TRACK_WIDTH_X = Constants.Swerve.TRACK_WIDTH_X;
+    private static final double TRACK_WIDTH_Y = Constants.Swerve.TRACK_WIDTH_Y;
+    private static final double DRIVE_BASE_RADIUS = Constants.Swerve.DRIVE_BASE_RADIUS;
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
     private final GyroIO gyroIO;
@@ -48,6 +56,7 @@ public class Drive extends SubsystemBase {
     private Rotation2d lastGyroRotation = new Rotation2d();
     private StructArrayPublisher<SwerveModuleState> publisher;
     private boolean isFieldOriented = true;
+    private ChassisSpeeds robotRelativeSpeeds;
 
     public Drive(
             GyroIO gyroIO,
@@ -56,6 +65,33 @@ public class Drive extends SubsystemBase {
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
+AutoBuilder.configureHolonomic()
+AutoBuilder.configureHolonomic(
+            this::getPose, // Robot pose supplier
+            this::setPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::runVelocity, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    4.5, // Max module speed, in m/s
+                            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                            new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+                    () -> {
+        // Boolean supplier that controls when the path will be mirrored for the red alliance
+        // This will flip the path being followed to the red side of the field.
+        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+    },
+            this // Reference to this subsystem to set requirements
+            );
+
         modules[FRONT_LEFT] = new Module(flModuleIO, 0, "FL");
         modules[FRONT_RIGHT] = new Module(frModuleIO, 1, "FR");
         modules[BACK_LEFT] = new Module(blModuleIO, 2, "BL");
@@ -71,6 +107,8 @@ public class Drive extends SubsystemBase {
         poseXDebug = Shuffleboard.getTab("General").add("Pose X", 0).getEntry();
         poseYDebug = Shuffleboard.getTab("General").add("Pose Y", 0).getEntry();
         poseRotDebug = Shuffleboard.getTab("General").add("Pose Rotation", 0).getEntry();
+        
+
     }
 
     public void periodic() {
@@ -148,23 +186,26 @@ public class Drive extends SubsystemBase {
 ////        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
 //
 //    }
-
-        public void runVelocity(Translation2d linearVelocity, double omega) {
+        public void setOrientation(Translation2d linearVelocity, double omega){
             Rotation2d rotation;
             if (isFieldOriented) {
                 rotation = getRotation();
             } else {
                 rotation = new Rotation2d(0);
             }
-            ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+             robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     linearVelocity.getX() * MAX_LINEAR_SPEED,
                     linearVelocity.getY() * MAX_LINEAR_SPEED,
                     omega * MAX_ANGULAR_SPEED,
                     rotation
             );
+            runVelocity(robotRelativeSpeeds);
+        }
+
+        public void runVelocity(ChassisSpeeds chassisSpeeds) {
 
         // Calculate module setpoints
-        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
@@ -184,6 +225,11 @@ public class Drive extends SubsystemBase {
 //        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
 //        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
 
+    }
+
+    public ChassisSpeeds getRobotRelativeSpeeds()
+    {
+        return robotRelativeSpeeds;
     }
 
     /**

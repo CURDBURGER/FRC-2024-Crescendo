@@ -61,7 +61,7 @@ public class DriveCommands {
 
                     // Convert to field relative speeds & send command
 
-                    drive.runVelocity(linearVelocity, omega);
+                    drive.setOrientation(linearVelocity, omega);
 
 //                    if(isFieldOriented){
 //                        drive.runVelocity(

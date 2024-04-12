@@ -24,7 +24,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-import static frc.robot.Constants.WheelModule.*;
+import static frc.robot.Constants.Swerve.*;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
