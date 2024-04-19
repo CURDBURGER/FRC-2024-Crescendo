@@ -38,12 +38,12 @@ public class DriveToPoseCommand extends Command {
         Rotation2d rotation = drive.getRotation();
         double xSpeed = speed*Math.cos(direction);
         double ySpeed = -speed*Math.sin(direction);
-        drive.runVelocity(new Translation2d(xSpeed, ySpeed), 0);
+        drive.setOrientation(new Translation2d(xSpeed, ySpeed), 0);
     }
 
     @Override
     public void end(boolean interrupted) {
-        drive.runVelocity(new Translation2d(0, 0), 0);
+        drive.runVelocity(new ChassisSpeeds());
     }
 
     @Override

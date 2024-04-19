@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -31,6 +32,10 @@ import frc.robot.subsystems.pickup.PivotSubsystem;
 
 import static frc.robot.Constants.Swerve.*;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -45,7 +50,7 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
-    private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+    private final SendableChooser<Command> autoChooser;
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController secondDriver = new CommandXboxController(1);
@@ -69,13 +74,23 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        autoChooser.addOption("Leave", AutoChoice.Leave);
-        autoChooser.addOption("One Piece", AutoChoice.OnePiece);
-        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
-        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
-        autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
+        // autoChooser.addOption("Leave", AutoChoice.Leave);
+        // autoChooser.addOption("One Piece", AutoChoice.OnePiece);
+        // autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
+        // autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
+        // autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
+
+        // Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+
+        autoChooser = AutoBuilder.buildAutoChooser();
 
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+
+        NamedCommands.registerCommand("Intake", new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        NamedCommands.registerCommand("Pivot In", new PivotCommand(pivotSubsystem, false));
+        NamedCommands.registerCommand("Pivot Out", new PivotCommand(pivotSubsystem, true));
+        NamedCommands.registerCommand("Shooting", getManualShoot());
+
     }
 
     public void robotEnabled() {
@@ -200,26 +215,27 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        //Getting shuffleboard value
-        AutoChoice autoChoice = autoChooser.getSelected();
-        Command command;
-        switch (autoChoice) {
-            case Leave:
-                command = LeaveCommand.create(drive);
-                break;
-            case OnePiece:
-                command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
-                break;
-            case TwoPiece:
-                command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-                break;
-            case FourPiece:
-                command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-                break;
-            default:
-                command = new SequentialCommandGroup();
-        }
-        return new ParallelCommandGroup(command);
+        // //Getting shuffleboard value
+        // AutoChoice autoChoice = autoChooser.getSelected();
+        // Command command;
+        // switch (autoChoice) {
+        //     case Leave:
+        //         command = LeaveCommand.create(drive);
+        //         break;
+        //     case OnePiece:
+        //         command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
+        //         break;
+        //     case TwoPiece:
+        //         command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+        //         break;
+        //     case FourPiece:
+        //         command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+        //         break;
+        //     default:
+        //         command = new SequentialCommandGroup();
+        // }
+        // return new ParallelCommandGroup(command);
+        return autoChooser.getSelected();
     }
 }
 

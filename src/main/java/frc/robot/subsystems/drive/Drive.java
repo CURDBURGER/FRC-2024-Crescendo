@@ -15,14 +15,20 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.ReplanningConfig;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -34,10 +40,10 @@ import static frc.robot.Constants.Swerve.*;
 
 public class Drive extends SubsystemBase {
 
-    private static final double MAX_LINEAR_SPEED = Constants.Swerve.MAX_LINEAR_SPEED;
-    private static final double TRACK_WIDTH_X = Constants.Swerve.TRACK_WIDTH_X;
-    private static final double TRACK_WIDTH_Y = Constants.Swerve.TRACK_WIDTH_Y;
-    private static final double DRIVE_BASE_RADIUS = Constants.Swerve.DRIVE_BASE_RADIUS;
+    private static final double MAX_LINEAR_SPEED = Constants.Swerve.maxLinearSpeed;
+    private static final double TRACK_WIDTH_X = Constants.Swerve.trackWidthX;
+    private static final double TRACK_WIDTH_Y = Constants.Swerve.trackWidthY;
+    private static final double DRIVE_BASE_RADIUS = Constants.Swerve.driveBaseRadius;
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
     private final GyroIO gyroIO;
@@ -65,19 +71,12 @@ public class Drive extends SubsystemBase {
             ModuleIO blModuleIO,
             ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
-AutoBuilder.configureHolonomic()
 AutoBuilder.configureHolonomic(
             this::getPose, // Robot pose supplier
             this::setPose, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             this::runVelocity, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-                    4.5, // Max module speed, in m/s
-                            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                            new ReplanningConfig() // Default path replanning config. See the API for the options here
-            ),
+            Constants.pathFollowerConfig,
                     () -> {
         // Boolean supplier that controls when the path will be mirrored for the red alliance
         // This will flip the path being followed to the red side of the field.
@@ -227,6 +226,36 @@ AutoBuilder.configureHolonomic(
 
     }
 
+     public Command followPathCommand(String pathName) {
+    PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+
+    return new FollowPathHolonomic(
+            path,
+            this::getPose, // Robot pose supplier
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::runVelocity, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    4.5, // Max module speed, in m/s
+                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  }
+
     public ChassisSpeeds getRobotRelativeSpeeds()
     {
         return robotRelativeSpeeds;
@@ -236,7 +265,7 @@ AutoBuilder.configureHolonomic(
      * Stops the drive.
      */
     public void stop() {
-        runVelocity(new Translation2d(), 0);
+        runVelocity(new ChassisSpeeds());
     }
 
     public void toggleIsFieldOriented() {
