@@ -13,28 +13,16 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-import frc.robot.commands.autoCommands.FourPieceCommand;
-import frc.robot.commands.autoCommands.LeaveCommand;
-import frc.robot.commands.autoCommands.OnePieceCommand;
-import frc.robot.commands.autoCommands.TwoPieceCommand;
-import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.pickup.IntakeSubsystem;
-import frc.robot.subsystems.pickup.PivotSubsystem;
-
 import static frc.robot.Constants.Swerve.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -45,10 +33,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
     private final SendableChooser<Command> autoChooser;
     // Controller
@@ -86,19 +70,13 @@ public class RobotContainer {
 
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
-        NamedCommands.registerCommand("Intake", new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        NamedCommands.registerCommand("Pivot In", new PivotCommand(pivotSubsystem, false));
-        NamedCommands.registerCommand("Pivot Out", new PivotCommand(pivotSubsystem, true));
-        NamedCommands.registerCommand("Shooting", getManualShoot());
 
     }
 
     public void robotEnabled() {
-        new PivotCommand(pivotSubsystem, false);
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
-        climberSubsystem.resetEncoders();
     }
 
     /**
@@ -108,34 +86,6 @@ public class RobotContainer {
      * JoystickButton}.
      */
     private void configureButtonBindings() {
-        //Climber
-        driver.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        driver.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        secondDriver.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        secondDriver.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        secondDriver.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, true));
-        secondDriver.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, true));
-        secondDriver.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, false));
-        secondDriver.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, false));
-
-        //Shooting
-        driver.rightTrigger().onTrue(getManualShoot());
-
-        //Intake
-        driver.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        driver.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
-        driver.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
-        driver.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        secondDriver.y().onTrue(Commands.runOnce(() -> pivotSubsystem.setOverwrite(true)));
-        secondDriver.y().onFalse(Commands.runOnce(() -> pivotSubsystem.setOverwrite(false)));
-
-        //Spit
-        driver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-        secondDriver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-
-        //Center
-        driver.povDown().whileTrue(getCentering());
-        secondDriver.a().whileTrue(getCentering());
 
         //Drive
         driver.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
@@ -166,77 +116,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
 
-//    private Command getAutoShoot() {
-//        return new ParallelRaceGroup(
-//                // spin up
-//                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
-//                new SequentialCommandGroup(
-//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
-//                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
-//                        new ParallelRaceGroup(
-//                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-//                                new TimerCommand(Constants.Shooter.outtakeTime)
-//                        )
-//                )
-//        );
-//    }
 
-    private Command getManualShoot() {
-        return new ParallelRaceGroup(
-                // spin up
-                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new TimerCommand(500),
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
-                        ),
-                        new TimerCommand(250),
-                        new ParallelRaceGroup(
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                                new TimerCommand(Constants.Shooter.outtakeTime)
-                        )
-                )
-        );
-    }
-    public Command getCentering() {
-        return new RepeatCommand(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new TimerCommand(250),
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
-                        ),
-                        new TimerCommand(100),
-                        new ParallelRaceGroup(
-                                new TimerCommand(200),
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed)
-                        )
-                )
-        );
-    }
-
-    public Command getAutonomousCommand() {
-        // //Getting shuffleboard value
-        // AutoChoice autoChoice = autoChooser.getSelected();
-        // Command command;
-        // switch (autoChoice) {
-        //     case Leave:
-        //         command = LeaveCommand.create(drive);
-        //         break;
-        //     case OnePiece:
-        //         command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
-        //         break;
-        //     case TwoPiece:
-        //         command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-        //         break;
-        //     case FourPiece:
-        //         command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-        //         break;
-        //     default:
-        //         command = new SequentialCommandGroup();
-        // }
-        // return new ParallelCommandGroup(command);
-        return autoChooser.getSelected();
-    }
 }
 
 
