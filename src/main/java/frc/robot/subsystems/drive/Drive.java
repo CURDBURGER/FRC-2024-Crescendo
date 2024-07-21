@@ -136,16 +136,16 @@ AutoBuilder.configureHolonomic(
         gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
         gyroRollDebug.setDouble(gyroInputs.rollPosition.getDegrees());
         gyroPitchDebug.setDouble(gyroInputs.pitchPosition.getDegrees());
-//        if (gyroInputs.connected) {
-//            // If the gyro is connected, replace the theta component of the twist
-//            // with the change in angle since the last loop cycle.
-//            twist = new Twist2d(
-//                    twist.dx,
-//                    twist.dy,
-//                    gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
-//            );
-//            lastGyroRotation = gyroInputs.yawPosition;
-//        }
+    //    if (gyroInputs.connected) {
+           // If the gyro is connected, replace the theta component of the twist
+           // with the change in angle since the last loop cycle.
+    //        twist = new Twist2d(
+    //                twist.dx,
+    //                twist.dy,
+    //                gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
+    //        );
+    //        lastGyroRotation = gyroInputs.yawPosition;
+    //    }
         // Apply the twist (change since last loop cycle) to the current pose
         pose = pose.exp(twist);
 

@@ -100,7 +100,7 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
-        drive.setFieldState(false);
+        drive.setFieldState(true);
         climberSubsystem.resetEncoders();
     }
 
