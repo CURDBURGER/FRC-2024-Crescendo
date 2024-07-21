@@ -268,6 +268,9 @@ AutoBuilder.configureHolonomic(
         runVelocity(new ChassisSpeeds());
     }
 
+    public void setFieldState(boolean bool){
+        isFieldOriented = bool;
+    }
     public void toggleIsFieldOriented() {
         isFieldOriented = !isFieldOriented;
     }

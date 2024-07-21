@@ -50,7 +50,9 @@ public class RobotContainer {
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
-    private final SendableChooser<Command> autoChooser;
+//     private final SendableChooser<Command> autoChooser;
+private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController secondDriver = new CommandXboxController(1);
@@ -74,15 +76,15 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        // autoChooser.addOption("Leave", AutoChoice.Leave);
-        // autoChooser.addOption("One Piece", AutoChoice.OnePiece);
-        // autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
-        // autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
-        // autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
+        autoChooser.addOption("Leave", AutoChoice.Leave);
+        autoChooser.addOption("One Piece", AutoChoice.OnePiece);
+        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
+        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
+        autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
 
         // Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
-        autoChooser = AutoBuilder.buildAutoChooser();
+        // autoChooser = AutoBuilder.buildAutoChooser();
 
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
@@ -98,6 +100,7 @@ public class RobotContainer {
         drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
+        drive.setFieldState(false);
         climberSubsystem.resetEncoders();
     }
 
@@ -215,27 +218,26 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // //Getting shuffleboard value
-        // AutoChoice autoChoice = autoChooser.getSelected();
-        // Command command;
-        // switch (autoChoice) {
-        //     case Leave:
-        //         command = LeaveCommand.create(drive);
-        //         break;
-        //     case OnePiece:
-        //         command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
-        //         break;
-        //     case TwoPiece:
-        //         command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-        //         break;
-        //     case FourPiece:
-        //         command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-        //         break;
-        //     default:
-        //         command = new SequentialCommandGroup();
-        // }
-        // return new ParallelCommandGroup(command);
-        return autoChooser.getSelected();
+        //Getting shuffleboard value
+        AutoChoice autoChoice = autoChooser.getSelected();
+        Command command;
+        switch (autoChoice) {
+            case Leave:
+                command = LeaveCommand.create(drive);
+                break;
+            case OnePiece:
+                command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
+                break;
+            case TwoPiece:
+                command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                break;
+            case FourPiece:
+                command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                break;
+            default:
+                command = new SequentialCommandGroup();
+        }
+        return new ParallelCommandGroup(command);
     }
 }
 

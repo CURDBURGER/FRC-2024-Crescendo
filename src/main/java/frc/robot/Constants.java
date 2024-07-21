@@ -38,7 +38,7 @@ public final class Constants {
         public static final int FRONT_RIGHT = 1;
         public static final int BACK_LEFT = 2;
         public static final int BACK_RIGHT = 3;
-        public static final double maxLinearSpeed = Units.feetToMeters(7);
+        public static final double maxLinearSpeed = Units.feetToMeters(14.5);
         public static final double trackWidthX = Units.inchesToMeters(25.0);
         public static final double trackWidthY = Units.inchesToMeters(25.0);
         public static final double driveBaseRadius = Math.hypot(trackWidthX / 2.0, trackWidthY / 2.0);

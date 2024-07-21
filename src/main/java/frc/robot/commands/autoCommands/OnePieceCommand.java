@@ -31,8 +31,8 @@ public class OnePieceCommand extends Command {
                                         )
                                 )
                         )
-                ),
-                new DriveToPoseCommand(drive, .15, 2, 70)
+                )
+                // new DriveToPoseCommand(drive, .15, 2, 70)
         );
     }
 

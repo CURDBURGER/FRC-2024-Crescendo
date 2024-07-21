@@ -34,7 +34,7 @@ public class TwoPieceCommand extends Command {
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote - .2, 0),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote, 0),
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
@@ -43,7 +43,7 @@ public class TwoPieceCommand extends Command {
                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + .5, 180),
+                        new DriveToPoseCommand(drive, Constants.Auto.normalSpeed, Constants.Auto.xDistanceToNote + .4, 180),
                         new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
