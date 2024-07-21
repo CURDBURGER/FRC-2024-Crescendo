@@ -192,7 +192,9 @@ public class Drive extends SubsystemBase {
     public void stop() {
         runVelocity(new Translation2d(), 0);
     }
-
+    public void setFieldState(boolean bool){
+        isFieldOriented = bool;
+    }
     public void toggleIsFieldOriented() {
         isFieldOriented = !isFieldOriented;
     }

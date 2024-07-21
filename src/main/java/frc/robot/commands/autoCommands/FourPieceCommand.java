@@ -38,12 +38,12 @@ public class FourPieceCommand {
                         new PivotCommand(pivotSubsystem, true)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.slowSpeed, Constants.Auto.noteRadius, 0),
+                        new DriveToPoseCommand(drive, Constants.Auto.slowSpeed, Constants.Auto.noteRadius+0.2, 0),
                         new PivotCommand(pivotSubsystem, true),
                         new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
                 ),
                 new ParallelRaceGroup(
-                        new DriveToPoseCommand(drive, Constants.Auto.fastSpeed, Constants.Auto.xDistanceToNote + Constants.Auto.noteRadius, 180),
+                        new DriveToPoseCommand(drive, Constants.Auto.fastSpeed, Constants.Auto.xDistanceToNote + Constants.Auto.noteRadius+0.2, 180),
                         new PivotCommand(pivotSubsystem, false)
                 ),
                 new ParallelRaceGroup(
