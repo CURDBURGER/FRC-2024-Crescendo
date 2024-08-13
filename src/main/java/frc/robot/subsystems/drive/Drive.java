@@ -31,6 +31,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.subsystems.PoseEstimationSubsystem;
 
 import static frc.robot.Constants.Swerve.*;
 
@@ -46,6 +47,7 @@ public class Drive extends SubsystemBase {
     private static final double DRIVE_BASE_RADIUS = Constants.Swerve.driveBaseRadius;
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
+    private final PoseEstimationSubsystem poseEstimationSubsystem;
     private final GyroIO gyroIO;
     private final GyroIO.GyroIOInputs gyroInputs = new GyroIO.GyroIOInputs();
     private GenericEntry gyroYawDebug;
@@ -69,11 +71,12 @@ public class Drive extends SubsystemBase {
             ModuleIO flModuleIO,
             ModuleIO frModuleIO,
             ModuleIO blModuleIO,
-            ModuleIO brModuleIO) {
+            ModuleIO brModuleIO, PoseEstimationSubsystem poseEstimationSubsystem) {
         this.gyroIO = gyroIO;
-AutoBuilder.configureHolonomic(
-            this::getPose, // Robot pose supplier
-            this::setPose, // Method to reset odometry (will be called if your auto has a starting pose)
+        this.poseEstimationSubsystem = poseEstimationSubsystem;
+        AutoBuilder.configureHolonomic(
+            poseEstimationSubsystem::getCurrentPose, // Robot pose supplier
+            poseEstimationSubsystem::setCurrentPose, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             this::runVelocity, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             Constants.pathFollowerConfig,
@@ -122,38 +125,6 @@ AutoBuilder.configureHolonomic(
                 module.stop();
             }
         }
-
-        // Update odometry
-        SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
-        for (int i = 0; i < 4; i++) {
-            wheelDeltas[i] = modules[i].getPositionDelta();
-        }
-
-        // The twist represents the motion of the robot since the last
-        // loop cycle in x, y, and theta based only on the modules,
-        // without the gyro. The gyro is always disconnected in simulation.
-        var twist = kinematics.toTwist2d(wheelDeltas);
-        gyroYawDebug.setDouble(gyroInputs.yawPosition.getDegrees());
-        gyroRollDebug.setDouble(gyroInputs.rollPosition.getDegrees());
-        gyroPitchDebug.setDouble(gyroInputs.pitchPosition.getDegrees());
-    //    if (gyroInputs.connected) {
-           // If the gyro is connected, replace the theta component of the twist
-           // with the change in angle since the last loop cycle.
-    //        twist = new Twist2d(
-    //                twist.dx,
-    //                twist.dy,
-    //                gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()
-    //        );
-    //        lastGyroRotation = gyroInputs.yawPosition;
-    //    }
-        // Apply the twist (change since last loop cycle) to the current pose
-        pose = pose.exp(twist);
-
-        poseXDebug.setDouble(pose.getX());
-        poseYDebug.setDouble(pose.getY());
-        poseRotDebug.setDouble(pose.getRotation().getDegrees());
-//
-
     }
 
     /**
@@ -161,34 +132,11 @@ AutoBuilder.configureHolonomic(
      *
 //     * @param speeds Speeds in meters/sec
      */
-//    public void runVelocity(ChassisSpeeds speeds) {
-//
-//        // Calculate module setpoints
-//        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-//        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-//        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
-//
-//        // Send setpoints to modules
-//        SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
-//        for (int i = 0; i < 4; i++) {
-//            // The module returns the optimized state, useful for logging
-//            optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
-//        }
-//
-//        optimizedSetpointStates = setpointStates;
-//
-//        publisher.set(optimizedSetpointStates);
-//
-//
-//        // Log setpoint states
-////        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-////        Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-//
-//    }
+
         public void setOrientation(Translation2d linearVelocity, double omega){
             Rotation2d rotation;
             if (isFieldOriented) {
-                rotation = getRotation();
+                rotation = poseEstimationSubsystem.getCurrentPose().getRotation();
             } else {
                 rotation = new Rotation2d(0);
             }
@@ -231,7 +179,7 @@ AutoBuilder.configureHolonomic(
 
     return new FollowPathHolonomic(
             path,
-            this::getPose, // Robot pose supplier
+            poseEstimationSubsystem::getCurrentPose, // Robot pose supplier
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             this::runVelocity, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
@@ -321,39 +269,19 @@ AutoBuilder.configureHolonomic(
      * Returns the module states (turn angles and drive velocities) for all of the modules.
      */
 //    @AutoLogOutput(key = "SwerveStates/Measured")
-    private SwerveModuleState[] getModuleStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
+    public SwerveModulePosition[] getModulePositions() {
+        SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (int i = 0; i < 4; i++) {
-            states[i] = modules[i].getState();
+            positions[i] = modules[i].getPosition();
         }
-        return states;
-    }
-
-    /**
-     * Returns the current odometry pose.
-     */
-//    @AutoLogOutput(key = "Odometry/Robot")
-    public Pose2d getPose() {
-        return pose;
-    }
-
-    /**
-     * Returns the current odometry rotation.
-     */
-    public Rotation2d getRotation() {
-        return pose.getRotation();
-    }
-
-    /**
-     * Resets the current odometry pose.
-     */
-    public void setPose(Pose2d pose) {
-        this.pose = pose;
+        return positions;
     }
 
     public void resetGyro() {
         gyroIO.resetGyro();
     }
+
+    public Rotation2d getGyroRotation() {return new Rotation2d(gyroInputs.yawPosition.getRadians());}
 
     /**
      * Returns the maximum linear speed in meters per sec.

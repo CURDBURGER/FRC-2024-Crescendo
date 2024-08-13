@@ -23,6 +23,7 @@ import frc.robot.commands.autoCommands.LeaveCommand;
 import frc.robot.commands.autoCommands.OnePieceCommand;
 import frc.robot.commands.autoCommands.TwoPieceCommand;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.PoseEstimationSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
@@ -30,11 +31,13 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
 
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static frc.robot.Constants.Swerve.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,14 +47,16 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
  */
 public class RobotContainer {
     // Subsystems
-    private final Drive drive;
+    private Drive drive;
+    private final PoseEstimationSubsystem poseEstimationSubsystem;
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
     private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
     //random vars
-//     private final SendableChooser<Command> autoChooser;
-private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
+    private final PhotonCamera photonCamera = new PhotonCamera("camera");
+    //private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -71,8 +76,12 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
                 new ModuleIOTalonFX(FRONT_LEFT),
                 new ModuleIOTalonFX(FRONT_RIGHT),
                 new ModuleIOTalonFX(BACK_LEFT),
-                new ModuleIOTalonFX(BACK_RIGHT)
+                new ModuleIOTalonFX(BACK_RIGHT),
+                poseEstimationSubsystem = new PoseEstimationSubsystem(photonCamera, drive)
         );
+
+
+
         // Configure the button bindings
         configureButtonBindings();
 
@@ -97,7 +106,7 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
 
     public void robotEnabled() {
         new PivotCommand(pivotSubsystem, false);
-        drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        poseEstimationSubsystem.setCurrentPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
         drive.setFieldState(true);
@@ -129,8 +138,8 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
         driver.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
         driver.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
         driver.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        secondDriver.y().onTrue(Commands.runOnce(() -> pivotSubsystem.setOverwrite(true)));
-        secondDriver.y().onFalse(Commands.runOnce(() -> pivotSubsystem.setOverwrite(false)));
+        secondDriver.y().onTrue(runOnce(() -> pivotSubsystem.setOverwrite(true)));
+        secondDriver.y().onFalse(runOnce(() -> pivotSubsystem.setOverwrite(false)));
 
         //Spit
         driver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
@@ -141,8 +150,8 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
         secondDriver.a().whileTrue(getCentering());
 
         //Drive
-        driver.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        driver.povLeft().onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
+        driver.povUp().onTrue(runOnce(poseEstimationSubsystem::resetFieldPosition));
+        driver.povLeft().onTrue(runOnce(() -> drive.toggleIsFieldOriented()));
 
         drive.setDefaultCommand(
                 DriveCommands.joystickDrive(
@@ -183,7 +192,6 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
 //                )
 //        );
 //    }
-
     private Command getManualShoot() {
         return new ParallelRaceGroup(
                 // spin up
@@ -201,6 +209,7 @@ private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
                 )
         );
     }
+
     public Command getCentering() {
         return new RepeatCommand(
                 new SequentialCommandGroup(
