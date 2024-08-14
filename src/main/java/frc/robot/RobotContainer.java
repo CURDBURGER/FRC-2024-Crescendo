@@ -80,7 +80,10 @@ public class RobotContainer {
                 poseEstimationSubsystem = new PoseEstimationSubsystem(photonCamera, drive)
         );
 
-
+        NamedCommands.registerCommand("Intake", new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
+        NamedCommands.registerCommand("Pivot In", new PivotCommand(pivotSubsystem, false));
+        NamedCommands.registerCommand("Pivot Out", new PivotCommand(pivotSubsystem, true));
+        NamedCommands.registerCommand("Shoot", getManualShoot());
 
         // Configure the button bindings
         configureButtonBindings();
@@ -96,12 +99,6 @@ public class RobotContainer {
         // autoChooser = AutoBuilder.buildAutoChooser();
 
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
-
-        NamedCommands.registerCommand("Intake", new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        NamedCommands.registerCommand("Pivot In", new PivotCommand(pivotSubsystem, false));
-        NamedCommands.registerCommand("Pivot Out", new PivotCommand(pivotSubsystem, true));
-        NamedCommands.registerCommand("Shooting", getManualShoot());
-
     }
 
     public void robotEnabled() {
@@ -229,24 +226,24 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         //Getting shuffleboard value
         AutoChoice autoChoice = autoChooser.getSelected();
-        Command command;
+        String command;
         switch (autoChoice) {
             case Leave:
-                command = LeaveCommand.create(drive);
+                command = "Leave";
                 break;
             case OnePiece:
-                command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
+                command = "One Piece";
                 break;
             case TwoPiece:
-                command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                command = "Two Piece";
                 break;
             case FourPiece:
-                command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+                command = "Four Piece";
                 break;
             default:
-                command = new SequentialCommandGroup();
+                command = "Leave";
         }
-        return new ParallelCommandGroup(command);
+        return new PathPlannerAuto(command);
     }
 }
 

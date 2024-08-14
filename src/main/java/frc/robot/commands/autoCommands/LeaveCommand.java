@@ -6,15 +6,16 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.TimerCommand;
+import frc.robot.subsystems.PoseEstimationSubsystem;
 import frc.robot.subsystems.drive.Drive;
 
 
 public class LeaveCommand {
 
-    public static Command create(Drive drive) {
+    public static Command create(Drive drive, PoseEstimationSubsystem poseEstimationSubsystem) {
         return new SequentialCommandGroup(
                 new TimerCommand(10000),
-                new DriveToPoseCommand(drive, .3,3, 0)
+                new DriveToPoseCommand(drive,poseEstimationSubsystem, .3,3, 0)
         );
     }
 
