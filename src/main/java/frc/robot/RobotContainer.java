@@ -24,7 +24,7 @@ import frc.robot.commands.autoCommands.TwoPieceCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.pickup.IntakeSubsystem;
 import frc.robot.subsystems.pickup.PivotSubsystem;
@@ -60,7 +60,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         drive = new Drive(
-                new GyroIONavX(),
+                new GyroIOPigeon2(),
                 new ModuleIOTalonFX(FRONT_LEFT),
                 new ModuleIOTalonFX(FRONT_RIGHT),
                 new ModuleIOTalonFX(BACK_LEFT),
