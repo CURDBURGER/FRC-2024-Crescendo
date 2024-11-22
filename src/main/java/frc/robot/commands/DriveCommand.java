@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -14,16 +13,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.Constants;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
-public class DriveCommands {
+public class DriveCommand {
     private static ShuffleboardTab tab = Shuffleboard.getTab("General");
-    //    private static GenericEntry xLog, yLog, zLog;
-    private static GenericEntry xLog = tab.add("x forward", 0.0).getEntry();
-    private static GenericEntry yLog = tab.add("y left", 0.0).getEntry();
-    private static GenericEntry zLog = tab.add("z rotate ccw", 0.0).getEntry();
 
-    private DriveCommands() {
+    private DriveCommand() {
     }
 
     /**
@@ -34,7 +30,7 @@ public class DriveCommands {
             DoubleSupplier xSupplier,
             DoubleSupplier ySupplier,
             DoubleSupplier omegaSupplier
-            ) {
+    ) {
         return Commands.run(
                 () -> {
                     // Apply deadband
@@ -48,11 +44,6 @@ public class DriveCommands {
                     linearMagnitude = linearMagnitude * linearMagnitude;
                     omega = Math.copySign(omega * omega, omega);
 
-                    // Log inputs after deadband and square
-                    xLog.setDouble(linearDirection.getCos() * linearMagnitude);
-                    yLog.setDouble(linearDirection.getSin() * linearMagnitude);
-                    zLog.setDouble(omega);
-
                     // Calculate new linear velocity
                     Translation2d linearVelocity =
                             new Pose2d(new Translation2d(), linearDirection)
@@ -62,26 +53,6 @@ public class DriveCommands {
                     // Convert to field relative speeds & send command
 
                     drive.runVelocity(linearVelocity, omega);
-
-//                    if(isFieldOriented){
-//                        drive.runVelocity(
-//                                ChassisSpeeds.fromFieldRelativeSpeeds(
-//                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-//                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-//                                        omega * drive.getMaxAngularSpeedRadPerSec(),
-//                                        drive.getRotation()
-//                                )
-//                        );
-//                    } else {
-//                        drive.runVelocity(
-//                                ChassisSpeeds.fromFieldRelativeSpeeds(
-//                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-//                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-//                                        omega * drive.getMaxAngularSpeedRadPerSec(),
-//                                        new Rotation2d(0)
-//                                )
-//                        );
-//                    }
                 },
                 drive);
     }

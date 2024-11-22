@@ -7,129 +7,92 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-import frc.robot.commands.autoCommands.FourPieceCommand;
-import frc.robot.commands.autoCommands.LeaveCommand;
-import frc.robot.commands.autoCommands.OnePieceCommand;
-import frc.robot.commands.autoCommands.TwoPieceCommand;
-import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.commands.autoCommands.Auto1Command;
+import frc.robot.commands.autoCommands.Auto2Command;
+import frc.robot.subsystems.PoseEstimationSubsystem;
+// import frc.robot.subsystems.TemplateSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIONavX;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.pickup.IntakeSubsystem;
-import frc.robot.subsystems.pickup.PivotSubsystem;
 
-import static frc.robot.Constants.WheelModule.*;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static frc.robot.Constants.Swerve.*;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
+
+import org.photonvision.PhotonCamera;
+
+
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    private final PivotSubsystem pivotSubsystem = new PivotSubsystem();
-    //random vars
+    private final PoseEstimationSubsystem poseEstimationSubsystem;
+    // private final TemplateSubsystem templateSubsystem = new TemplateSubsystem();
+
+    //Miscellaneous
     private final SendableChooser<AutoChoice> autoChooser = new SendableChooser<>();
-    // Controller
+
+    // Controllers
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandXboxController secondDriver = new CommandXboxController(1);
 
-    // Dashboard inputs
 
-    // private final LoggedDashboardChooser<Command> autoChooser;
-//  private final LoggedDashboardNumber flywheelSpeedInput = new LoggedDashboardNumber("Flywheel Speed", 1500.0);
-
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    //Define stuff in here
     public RobotContainer() {
         drive = new Drive(
-                new GyroIONavX(),
+                new GyroIOPigeon2(),//change if using different gyro
                 new ModuleIOTalonFX(FRONT_LEFT),
                 new ModuleIOTalonFX(FRONT_RIGHT),
                 new ModuleIOTalonFX(BACK_LEFT),
                 new ModuleIOTalonFX(BACK_RIGHT)
         );
-        // Configure the button bindings
+
+        poseEstimationSubsystem = new PoseEstimationSubsystem(
+                drive::getGyroRotation,
+                drive::getModulePositions
+        );
+
+        drive.setPoseEstimationSubsystem(poseEstimationSubsystem);
+
         configureButtonBindings();
 
-        autoChooser.addOption("Leave", AutoChoice.Leave);
-        autoChooser.addOption("One Piece", AutoChoice.OnePiece);
-        autoChooser.addOption("Two Piece", AutoChoice.TwoPiece);
-        autoChooser.addOption("Four Piece", AutoChoice.FourPiece);
-        autoChooser.setDefaultOption("Leave", AutoChoice.Leave);
-
+        //Add autos to shuffleboard
+        autoChooser.addOption("Auto 1", AutoChoice.Auto1);
+        autoChooser.addOption("Auto 2", AutoChoice.Auto2);
         Shuffleboard.getTab("General").add("Auto Choice", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
     }
 
+    //Actions run when robot is enabled
     public void robotEnabled() {
-        new PivotCommand(pivotSubsystem, false);
-        drive.setPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        poseEstimationSubsystem.setCurrentPose(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         drive.straightenWheels();
         drive.resetGyro();
-        climberSubsystem.resetEncoders();
+        drive.setFieldState(true);
+
+        // templateSubsystem.resetEncoder();
     }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * Joystick} or {@link XboxController}), and then passing it to a {@link
-     * JoystickButton}.
-     */
+
+    //Map commands to controller buttons
     private void configureButtonBindings() {
-        //Climber
-        driver.leftTrigger().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        driver.leftBumper().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        secondDriver.start().whileTrue(new ClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed));
-        secondDriver.back().whileTrue(new ClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed));
-        secondDriver.rightTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, true));
-        secondDriver.rightBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, true));
-        secondDriver.leftTrigger().whileTrue(new SingleClimberCommand(climberSubsystem, -Constants.Climber.fastClimberSpeed, false));
-        secondDriver.leftBumper().whileTrue(new SingleClimberCommand(climberSubsystem, Constants.Climber.fastClimberSpeed, false));
 
-        //Shooting
-        driver.rightTrigger().onTrue(getManualShoot());
-
-        //Intake
-        driver.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        driver.rightBumper().whileTrue(new PivotCommand(pivotSubsystem, true));
-        driver.rightBumper().whileFalse(new PivotCommand(pivotSubsystem, false));
-        driver.a().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed));
-        secondDriver.y().onTrue(Commands.runOnce(() -> pivotSubsystem.setOverwrite(true)));
-        secondDriver.y().onFalse(Commands.runOnce(() -> pivotSubsystem.setOverwrite(false)));
-
-        //Spit
-        driver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-        secondDriver.x().whileTrue(new IntakeCommand(intakeSubsystem, Constants.NotePickup.spitSpeed));
-
-        //Center
-        driver.povDown().whileTrue(getCentering());
-        secondDriver.a().whileTrue(getCentering());
+        //Template
+        // driver.a().whileTrue(new TemplateCommand(templateSubsystem, Constants.Template.motorSpeed));
 
         //Drive
-        driver.povUp().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive));
-        driver.povLeft().onTrue(Commands.runOnce(() -> drive.toggleIsFieldOriented()));
+        driver.povUp().onTrue(Commands.runOnce(() -> poseEstimationSubsystem.setCurrentPose(new Pose2d(poseEstimationSubsystem.getCurrentPose().getTranslation(), new Rotation2d())), poseEstimationSubsystem));
+        driver.povLeft().onTrue(runOnce(drive::toggleIsFieldOriented));
 
         drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
+                DriveCommand.joystickDrive(
                         drive,
-                        () -> { // x forward is front, -x is backward
+                        () -> { // x+ forward is front, x- is backward
 //                            return joystick.getY();
                             return driver.getLeftY();
                         },
@@ -145,80 +108,23 @@ public class RobotContainer {
         );
     }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
 
-//    private Command getAutoShoot() {
-//        return new ParallelRaceGroup(
-//                // spin up
-//                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
-//                new SequentialCommandGroup(
-//                        new AutomaticAlignCommand(aprilTagSubsystem, drive),
-//                        new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed),
-//                        new ParallelRaceGroup(
-//                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-//                                new TimerCommand(Constants.Shooter.outtakeTime)
-//                        )
-//                )
-//        );
-//    }
-
-    private Command getManualShoot() {
-        return new ParallelRaceGroup(
-                // spin up
-                new ManualShooterCommand(shooterSubsystem, Constants.Shooter.speaker),
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new TimerCommand(500),
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
-                        ),
-                        new TimerCommand(250),
-                        new ParallelRaceGroup(
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed),
-                                new TimerCommand(Constants.Shooter.outtakeTime)
-                        )
-                )
-        );
-    }
-    public Command getCentering() {
-        return new RepeatCommand(
-                new SequentialCommandGroup(
-                        new ParallelRaceGroup(
-                                new TimerCommand(250),
-                                new IntakeCommand(intakeSubsystem, Constants.NotePickup.inputMotorSpeed)
-                        ),
-                        new TimerCommand(100),
-                        new ParallelRaceGroup(
-                                new TimerCommand(200),
-                                new IntakeCommand(intakeSubsystem, -Constants.NotePickup.inputMotorSpeed)
-                        )
-                )
-        );
-    }
-
+    //Pass pathplanner autos to robot
     public Command getAutonomousCommand() {
-        //Getting shuffleboard value
         AutoChoice autoChoice = autoChooser.getSelected();
         Command command;
+
         switch (autoChoice) {
-            case Leave:
-                command = LeaveCommand.create(drive);
+            case Auto1:
+                command = Auto1Command.create(drive);
                 break;
-            case OnePiece:
-                command = OnePieceCommand.create(intakeSubsystem, shooterSubsystem, drive);
-                break;
-            case TwoPiece:
-                command = TwoPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
-                break;
-            case FourPiece:
-                command = FourPieceCommand.create(drive, intakeSubsystem, pivotSubsystem, shooterSubsystem);
+            case Auto2:
+                command = Auto2Command.create(drive);
                 break;
             default:
-                command = new SequentialCommandGroup();
+                command = Auto1Command.create(drive);
         }
+
         return new ParallelCommandGroup(command);
     }
 }
